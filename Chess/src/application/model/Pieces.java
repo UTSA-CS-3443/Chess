@@ -20,7 +20,7 @@ public class Pieces {
 	     * @param end
 	     * @return
 	     */
-	    public abstract boolean canMove(Board board, Spot start, Spot end);  // metodo astratto, ritorna se muovibile o no
+	    //public abstract boolean canMove(Board board, Spot start, Spot end);  // metodo astratto, ritorna se muovibile o no
 
 	}
 	public enum Chessmen {
