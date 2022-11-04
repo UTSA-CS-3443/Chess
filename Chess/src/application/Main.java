@@ -15,12 +15,11 @@ public class Main extends Application {
 		stage = primaryStage;
 		try {
 			GridPane root = new GridPane();
-			
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("../view/Main.fxml"));
+			loader.setLocation(getClass().getResource("view/Main.fxml"));
 			root = (GridPane) loader.load();
 			
-			Scene scene = new Scene(root,400,400);
+			Scene scene = new Scene(root,600,600);
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {
