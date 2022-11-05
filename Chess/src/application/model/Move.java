@@ -11,7 +11,11 @@ public class Move {
 	/**
 	 * 
 	 */
-	public Move() {
+	public Move(int fromRow, int fromCol, int toRow, int toCol) {
+		
+	}
+	
+	public Move(Coordinate from, Coordinate to) {
 		
 	}
 }
