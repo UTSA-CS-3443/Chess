@@ -34,4 +34,6 @@ public interface Movable {
 	 */
 	public List<Move> getLegalMoves(Game game, Coordinate coordinate);
 	
+	
+	
 }

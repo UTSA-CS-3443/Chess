@@ -4,7 +4,7 @@ import static application.model.Piece.*;
 import static application.model.Color.*;
 
 import java.util.HashMap;
-
+import java.util.regex.*;
 /**
  * The Game class contains all the information relevant to a game of chess.
  * For example, it has a 2d array of pieces, and contains information on
@@ -33,6 +33,7 @@ public class Game {
 	
 	private String whiteName,
 				   blackName;
+	HashMap<String, Integer> previousFENs = new HashMap<>();
 	
 	public Game(String whiteName, String blackName) {
 		this(Game.STARTING_FEN, whiteName, blackName);
@@ -157,11 +158,107 @@ public class Game {
 	 * 
 	 * 5. The same position repeats 3 times. The repeats
 	 * do not have to be consecutive. ("3-fold repetition").
+	 * @return 
 	 * @return
 	 */
-	public boolean isDraw() {
-		
+	
+	public boolean isThreefoldRepetition() {
+		String fen = getFEN();
+		String part [] =fen.split(" ");
+		String fenFirst4 = part[0]+part[1]+part[2]+part[3];
+		if(previousFENs.containsKey(fenFirst4)) {
+		    int repetitions = previousFENs.get(fenFirst4);
+		    if(repetitions > 2) {
+		       return true;
+		    } else {
+		        previousFENs.put(fenFirst4, repetitions + 1);
+		        return false;
+		    }
+		} else {
+		    previousFENs.put(fen, 1);
+		    return false;
 	}
+	}
+	
+	public boolean isFiftyMoveRule() {
+		
+		int halfclock = getHalfMoveCounter();	
+		if (halfclock >= 100) {
+			return true;
+			
+		}
+		else {
+			return false;
+		}
+}
+	public boolean isStalemate() {
+		return true;
+	}
+	public boolean isInsufficientMaterial(){
+		String fen = getFEN();
+		Pattern Ppattern = Pattern.compile("[Pp]");
+        Matcher Pmatcher = Ppattern.matcher(fen);
+        int Pcnt = 0;
+        int Ncnt = 0;
+        int Bcnt = 0;
+        int ncnt = 0;
+        int bcnt = 0;
+        int Qcnt = 0;
+        int Rcnt = 0;
+        Pattern Npattern = Pattern.compile("[N]");
+        Matcher Nmatcher = Npattern.matcher(fen);
+        Pattern Bpattern = Pattern.compile("[B]");
+        Matcher Bmatcher = Bpattern.matcher(fen);
+        Pattern npattern = Pattern.compile("[n]");
+        Matcher nmatcher = npattern.matcher(fen);
+        Pattern bpattern = Pattern.compile("[b]");
+        Matcher bmatcher = bpattern.matcher(fen);
+        Pattern Qpattern = Pattern.compile("[Qq]");
+        Matcher Qmatcher = Qpattern.matcher(fen);
+        Pattern Rpattern = Pattern.compile("[Rr]");
+        Matcher Rmatcher = Rpattern.matcher(fen);
+        
+        while (Pmatcher.find()) {
+            Pcnt++;
+        } 
+        while (Nmatcher.find()) {
+            Ncnt++;
+        } 
+        while (Rmatcher.find()) {
+            Rcnt++;
+        } 
+        while (Qmatcher.find()) {
+            Qcnt++;
+        } 
+        while (Bmatcher.find()) {
+            Bcnt++;
+        } 
+        while (bmatcher.find()) {
+            bcnt++;
+        } 
+        while (nmatcher.find()) {
+            ncnt++;
+        } 
+        
+        if(Pcnt == 0 && Qcnt == 0 && Rcnt == 0) {
+        	if (Ncnt ==0 && ncnt ==0 && Bcnt == 1 && bcnt == 1 || Ncnt == 1 && ncnt == 1 && Bcnt == 0 && bcnt == 0) {
+        		return true;
+        	}
+        	else {
+        		return false;
+        	}
+        } 
+        else {
+        	return false;
+        }
+       
+		
+      }
+	
+	
+		
+
+
 	
 	/**
 	 * Sets the current game based on the given fen.
@@ -290,6 +387,7 @@ public class Game {
 			   this.getHalfMoveCounter() +
 			   ' ' +
 			   this.getFullMoveCounter();
+		 
 		
 		return fen;
 	}
