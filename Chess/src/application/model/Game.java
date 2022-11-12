@@ -1,10 +1,12 @@
+
+
 package application.model;
 
 import static application.model.Piece.*;
 import static application.model.Color.*;
 
 import java.util.HashMap;
-import java.util.regex.*;
+
 /**
  * The Game class contains all the information relevant to a game of chess.
  * For example, it has a 2d array of pieces, and contains information on
@@ -30,6 +32,7 @@ public class Game {
 	private Coordinate enPassantTargetSquare;
 	private int halfMoveCounter,
 				fullMoveCounter;
+	
 	
 	private String whiteName,
 				   blackName;
@@ -78,25 +81,7 @@ public class Game {
 	 */
 	public boolean isLegalPosition() {
 		// Set up counts for pieces
-		HashMap<Piece, Integer> pieceCounts = new HashMap<>();
-		for(Piece piece : ALL_PIECES) {
-			pieceCounts.put(piece, 0);
-		}
-		int totalCountWhite = 0,
-			totalCountBlack = 0;
-		
-		// Iterate through board, count number of pieces
-		Piece[][] board = this.getBoard();
-		for(int r=0; r<board.length; r++) {
-			for(int c=0; c<board[r].length; c++) {
-				Piece piece = board[r][c];
-				if(piece != null) {
-					pieceCounts.put(piece, 1 + pieceCounts.get(piece));
-					if(piece.getColor() == WHITE) totalCountWhite += 1;
-					else totalCountBlack += 2;
-				}
-			}
-		}
+		 HashMap<Piece, Integer> pieceCounts = getPieceCount();
 		
 		// There should be exactly 1 white and black king
 		if(pieceCounts.get(WHITE_KING) != 1 ||
@@ -131,6 +116,28 @@ public class Game {
 		return this.getBoard()[row][col];
 	}
 	
+	
+	public HashMap<Piece,Integer> getPieceCount() {
+		HashMap<Piece, Integer> pieceCount = new HashMap<>();
+		for(Piece piece : ALL_PIECES) {
+			pieceCount.put(piece, 0);
+		}
+		Piece[][] board = this.getBoard();
+		for(int r=0; r<board.length; r++) {
+			for(int c=0; c<board[r].length; c++) {
+				Piece piece = board[r][c];
+				if(piece != null) {
+					pieceCount.put(piece, 1 + pieceCount.get(piece));
+				}
+			}
+		}
+		return pieceCount;
+	}
+	
+	
+	
+	
+	
 	/**
 	 * For a checkmate to occur, the king must be in check, and
 	 * there must be no legal moves for the side to move.
@@ -139,6 +146,7 @@ public class Game {
 	 * @see Game.isDraw()
 	 */
 	public boolean isCheckmate() {
+		
 		
 	}
 	
@@ -158,11 +166,24 @@ public class Game {
 	 * 
 	 * 5. The same position repeats 3 times. The repeats
 	 * do not have to be consecutive. ("3-fold repetition").
-	 * @return 
 	 * @return
 	 */
 	
-	public boolean isThreefoldRepetition() {
+	
+	/**
+	 * Sets the current game based on the given fen.
+	 * @param fen The FEN to load the game based off of.
+	 * @see Game.getFEN()
+	 */
+public boolean is50MoveRule() {
+	if(getHalfMoveCounter() >= 100) {
+		return true;	
+	}
+	else {
+		return false;
+	}
+}
+	public boolean is3FoldRepitition(){
 		String fen = getFEN();
 		String part [] =fen.split(" ");
 		String fenFirst4 = part[0]+part[1]+part[2]+part[3];
@@ -178,93 +199,35 @@ public class Game {
 		    previousFENs.put(fen, 1);
 		    return false;
 	}
+		
 	}
 	
-	public boolean isFiftyMoveRule() {
-		
-		int halfclock = getHalfMoveCounter();	
-		if (halfclock >= 100) {
-			return true;
-			
-		}
-		else {
-			return false;
-		}
-}
-	public boolean isStalemate() {
-		return true;
-	}
 	public boolean isInsufficientMaterial(){
-		String fen = getFEN();
-		Pattern Ppattern = Pattern.compile("[Pp]");
-        Matcher Pmatcher = Ppattern.matcher(fen);
-        int Pcnt = 0;
-        int Ncnt = 0;
-        int Bcnt = 0;
-        int ncnt = 0;
-        int bcnt = 0;
-        int Qcnt = 0;
-        int Rcnt = 0;
-        Pattern Npattern = Pattern.compile("[N]");
-        Matcher Nmatcher = Npattern.matcher(fen);
-        Pattern Bpattern = Pattern.compile("[B]");
-        Matcher Bmatcher = Bpattern.matcher(fen);
-        Pattern npattern = Pattern.compile("[n]");
-        Matcher nmatcher = npattern.matcher(fen);
-        Pattern bpattern = Pattern.compile("[b]");
-        Matcher bmatcher = bpattern.matcher(fen);
-        Pattern Qpattern = Pattern.compile("[Qq]");
-        Matcher Qmatcher = Qpattern.matcher(fen);
-        Pattern Rpattern = Pattern.compile("[Rr]");
-        Matcher Rmatcher = Rpattern.matcher(fen);
-        
-        while (Pmatcher.find()) {
-            Pcnt++;
-        } 
-        while (Nmatcher.find()) {
-            Ncnt++;
-        } 
-        while (Rmatcher.find()) {
-            Rcnt++;
-        } 
-        while (Qmatcher.find()) {
-            Qcnt++;
-        } 
-        while (Bmatcher.find()) {
-            Bcnt++;
-        } 
-        while (bmatcher.find()) {
-            bcnt++;
-        } 
-        while (nmatcher.find()) {
-            ncnt++;
-        } 
-        
-        if(Pcnt == 0 && Qcnt == 0 && Rcnt == 0) {
-        	if (Ncnt ==0 && ncnt ==0 && Bcnt == 1 && bcnt == 1 || Ncnt == 1 && ncnt == 1 && Bcnt == 0 && bcnt == 0) {
-        		return true;
-        	}
-        	else {
-        		return false;
-        	}
-        } 
-        else {
-        	return false;
-        }
-       
-		
-      }
+		 HashMap<Piece, Integer> pieceCounts = getPieceCount();
+		if(pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) == 0 
+				&& pieceCounts.get(WHITE_KNIGHT)<=1 && pieceCounts.get(BLACK_PAWN) == 0 && 	pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) == 0 
+						&& pieceCounts.get(BLACK_KNIGHT) == 0 || pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) == 0 
+								&& pieceCounts.get(WHITE_KNIGHT) ==0 && pieceCounts.get(BLACK_PAWN) == 0 && pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) == 0 
+								&& pieceCounts.get(BLACK_KNIGHT) <= 1)
+				   {
+					return true;
+				   }
+					
+					else if (pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) <= 1 
+							&& pieceCounts.get(WHITE_KNIGHT) ==0 && pieceCounts.get(BLACK_PAWN) == 0 && 	pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) == 0 
+							&& pieceCounts.get(BLACK_KNIGHT) == 0 || pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) == 0 
+									&& pieceCounts.get(WHITE_KNIGHT) ==0 && pieceCounts.get(BLACK_PAWN) == 0 && pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) <= 1
+									&& pieceCounts.get(BLACK_KNIGHT) == 0) {
+						return true;
+					} else {
+				
+	
+	return false;
+	}
+	}
 	
 	
-		
-
-
-	
-	/**
-	 * Sets the current game based on the given fen.
-	 * @param fen The FEN to load the game based off of.
-	 * @see Game.getFEN()
-	 */
+	//need to create previous fen list and update method
 	public void loadFromFEN(String fen) {
 		// Split the FEN into parts
 		String[] parts = fen.split(" ");
@@ -387,7 +350,6 @@ public class Game {
 			   this.getHalfMoveCounter() +
 			   ' ' +
 			   this.getFullMoveCounter();
-		 
 		
 		return fen;
 	}
@@ -488,3 +450,4 @@ public class Game {
 	
 	
 }
+

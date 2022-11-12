@@ -18,4 +18,5 @@ public class Move {
 	public Move(Coordinate from, Coordinate to) {
 		
 	}
+	
 }
