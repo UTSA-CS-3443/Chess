@@ -1,8 +1,8 @@
 package application.controller;
 
 import java.io.IOException;
-
 import application.Main;
+import application.model.Game;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -10,7 +10,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 
+class GameController{
+	public static Game game;
+}
+
 public class MainController implements EventHandler<ActionEvent> {
+	
 	 @FXML
 	    private Label player1Label;
 
@@ -33,6 +38,7 @@ public class MainController implements EventHandler<ActionEvent> {
 	    public void handle(ActionEvent event) {
 	    	player1.getText();
 	    	player2.getText();
+	    	 GameController.game = new Game(player1.getText(),player2.getText());
 	    	//create method to hold playerNames here 
 	    	try {
 				FXMLLoader loader = new FXMLLoader();
