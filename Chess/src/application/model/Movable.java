@@ -27,7 +27,7 @@ public interface Movable {
 	 * Gets a List of Moves that the piece is definitely allowed to make.
 	 * If the length of this list is 0, then the game has ended by
 	 * either checkmate or stalemate.
-	 * The Move class is responsible for determining the legality of a Move.
+	 * The Game class is responsible for determining the legality of a Move.
 	 * @param game - The game to generate moves from.
 	 * @param coordinate - The coordinate the piece sits on.
 	 * @return A List of Moves; all of which are legal (playable).
