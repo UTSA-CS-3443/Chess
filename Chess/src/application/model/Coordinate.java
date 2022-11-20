@@ -23,7 +23,7 @@ public class Coordinate {
 	 * @return Algebraic notation
 	 */
 	public String toAlgebraicNotation() {
-		return (String) ( (char) (this.col + 97) + ((Integer) this.row).toString());
+		return (String) ( (char) (this.col + 97) + ((Integer) this.row).toString() );
 	}
 
 	public int getRow() {

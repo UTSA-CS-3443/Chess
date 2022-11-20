@@ -18,32 +18,34 @@ import java.util.HashMap;
 public class Game {
 
 	public static final int BOARD_ROWS = 8,
-							BOARD_COLS = 8;
+			BOARD_COLS = 8;
 	public static final String STARTING_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-	
+
 	private Piece[][] board;
 	private Color turn;
 	private boolean whiteCanCastleKingside,
-					whiteCanCastleQueenside,
-					blackCanCastleKingside,
-					blackCanCastleQueenside;
+	whiteCanCastleQueenside,
+	blackCanCastleKingside,
+	blackCanCastleQueenside;
 	private Coordinate enPassantTargetSquare;
 	private int halfMoveCounter,
-				fullMoveCounter;
-	
+	fullMoveCounter;
+
 	private String whiteName,
-				   blackName;
-	
+	blackName;
+
+	HashMap<String, Integer> previousFENs = new HashMap<>();
+
 	public Game(String whiteName, String blackName) {
 		this(Game.STARTING_FEN, whiteName, blackName);
 	}
-	
+
 	public Game(String fen, String whiteName, String blackName) {
 		this.loadFromFEN(fen);
 		this.whiteName = whiteName;
 		this.blackName = blackName;
 	}
-	
+
 	/**
 	 * Tests whether a given coordinate lies within the board.
 	 * @param coordinate The coordinate to test.
@@ -53,7 +55,7 @@ public class Game {
 	public boolean isInBounds(Coordinate coordinate) {
 		return this.isInBounds(coordinate.getRow(), coordinate.getCol());
 	}
-	
+
 	/**
 	 * Tests whether a given row and col lie within the board.
 	 * @param row The row to test.
@@ -63,11 +65,11 @@ public class Game {
 	 */
 	public boolean isInBounds(int row, int col) {
 		return 0 <= row && 
-			   0 <= col && 
-			   row < this.getBoard().length &&
-			   col < this.getBoard()[row].length;
+				0 <= col && 
+				row < this.getBoard().length &&
+				col < this.getBoard()[row].length;
 	}
-	
+
 	/**
 	 * Detects if the game was set up in a legal position.
 	 * An example of an illegal position is one where the black king
@@ -82,31 +84,18 @@ public class Game {
 			pieceCounts.put(piece, 0);
 		}
 		int totalCountWhite = 0,
-			totalCountBlack = 0;
-		
-		// Iterate through board, count number of pieces
-		Piece[][] board = this.getBoard();
-		for(int r=0; r<board.length; r++) {
-			for(int c=0; c<board[r].length; c++) {
-				Piece piece = board[r][c];
-				if(piece != null) {
-					pieceCounts.put(piece, 1 + pieceCounts.get(piece));
-					if(piece.getColor() == WHITE) totalCountWhite += 1;
-					else totalCountBlack += 2;
-				}
-			}
-		}
-		
+				totalCountBlack = 0;
+
 		// There should be exactly 1 white and black king
 		if(pieceCounts.get(WHITE_KING) != 1 ||
-		   pieceCounts.get(BLACK_KING) != 1) {
+				pieceCounts.get(BLACK_KING) != 1) {
 			return false;
 		}
-		
+
 		// All else passed, position is legal
 		return true;
 	}
-	
+
 	/**
 	 * Gets the piece at a specific coordinate.
 	 * Note that (0, 0) is the top-left corner.
@@ -117,7 +106,7 @@ public class Game {
 	public Piece getPieceAt(Coordinate coordinate) {
 		return this.getPieceAt(coordinate.getRow(), coordinate.getCol());
 	}
-	
+
 	/**
 	 * Gets the piece at a specific row and col.
 	 * Note that (0, 0) is the top-left corner.
@@ -129,7 +118,32 @@ public class Game {
 	public Piece getPieceAt(int row, int col) {
 		return this.getBoard()[row][col];
 	}
-	
+
+	/**
+	 * 
+	 * @return
+	 */
+	public HashMap<Piece,Integer> getPieceCount() {
+		HashMap<Piece, Integer> pieceCount = new HashMap<>();
+		for(Piece piece : ALL_PIECES) {
+			pieceCount.put(piece, 0);
+		}
+		Piece[][] board = this.getBoard();
+		for(int r=0; r<board.length; r++) {
+			for(int c=0; c<board[r].length; c++) {
+				Piece piece = board[r][c];
+				if(piece != null) {
+					pieceCount.put(piece, 1 + pieceCount.get(piece));
+				}
+			}
+		}
+		return pieceCount;
+	}
+
+
+
+
+
 	/**
 	 * For a checkmate to occur, the king must be in check, and
 	 * there must be no legal moves for the side to move.
@@ -140,16 +154,16 @@ public class Game {
 	public boolean isCheckmate() {
 		return false;
 	}
-	
+
 	/**
 	 *
 	 * 
 	 */
 	public void changeTurn() {
-		
+
 	}
-	
-	/*
+
+	/**
 	 * A draw may be achieved in several ways:
 	 * 
 	 * 1. The players agree to a draw.
@@ -170,16 +184,81 @@ public class Game {
 	public boolean isDraw() {
 		return false; //!(isStalemate() && isThreefoldRepetition() && isFiftyMoveRule() && isInsufficientMaterial());
 	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean is50MoveRule() {
+		if(getHalfMoveCounter() >= 100) {
+			return true;	
+		}
+		else {
+			return false;
+		}
+	}
 	
-	/*
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean is3FoldRepetition(){
+		String fen = getFEN();
+		String part [] =fen.split(" ");
+		String fenFirst4 = part[0]+part[1]+part[2]+part[3];
+		if(previousFENs.containsKey(fenFirst4)) {
+			int repetitions = previousFENs.get(fenFirst4);
+			if(repetitions > 2) {
+				return true;
+			} else {
+				previousFENs.put(fenFirst4, repetitions + 1);
+				return false;
+			}
+		} else {
+			previousFENs.put(fen, 1);
+			return false;
+		}
+
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean isInsufficientMaterial(){
+		HashMap<Piece, Integer> pieceCounts = getPieceCount();
+		if(pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) == 0 
+				&& pieceCounts.get(WHITE_KNIGHT)<=1 && pieceCounts.get(BLACK_PAWN) == 0 && 	pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) == 0 
+				&& pieceCounts.get(BLACK_KNIGHT) == 0 || pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) == 0 
+				&& pieceCounts.get(WHITE_KNIGHT) ==0 && pieceCounts.get(BLACK_PAWN) == 0 && pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) == 0 
+				&& pieceCounts.get(BLACK_KNIGHT) <= 1)
+		{
+			return true;
+		}
+
+		else if (pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) <= 1 
+				&& pieceCounts.get(WHITE_KNIGHT) ==0 && pieceCounts.get(BLACK_PAWN) == 0 && 	pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) == 0 
+				&& pieceCounts.get(BLACK_KNIGHT) == 0 || pieceCounts.get(WHITE_PAWN) == 0 && 	pieceCounts.get(WHITE_ROOK)==0 && pieceCounts.get(WHITE_BISHOP) == 0 
+				&& pieceCounts.get(WHITE_KNIGHT) ==0 && pieceCounts.get(BLACK_PAWN) == 0 && pieceCounts.get(BLACK_ROOK)==0 && pieceCounts.get(BLACK_BISHOP) <= 1
+				&& pieceCounts.get(BLACK_KNIGHT) == 0) {
+			return true;
+		} else {
+
+
+			return false;
+		}
+	}
+
+	/**
 	 * Sets the current game based on the given fen.
 	 * @param fen The FEN to load the game based off of.
 	 * @see Game.getFEN()
 	 */
+	//need to create previous fen list and update method
 	public void loadFromFEN(String fen) {
 		// Split the FEN into parts
 		String[] parts = fen.split(" ");
-		
+
 		// Set pieces from part 1 of FEN
 		String[] pieces = parts[0].split("/");
 		Piece[][] board = new Piece[8][8];
@@ -191,24 +270,24 @@ public class Game {
 			}
 		}
 		this.setBoard(board);
-		
+
 		// Get the current turn
 		this.setTurn(parts[1].equals("w") ? WHITE : BLACK);
-		
+
 		// Get castling rights
 		this.setWhiteCanCastleKingside(parts[2].contains("K"));
 		this.setWhiteCanCastleQueenside(parts[2].contains("Q"));
 		this.setBlackCanCastleKingside(parts[2].contains("k"));
 		this.setBlackCanCastleQueenside(parts[2].contains("q"));
-		
+
 		// Get halfmove counter
 		this.setHalfMoveCounter(Integer.parseInt(parts[4]));
-		
+
 		// Get fullmove counter
 		this.setFullMoveCounter(Integer.parseInt(parts[5]));
 	}
-	
-	/*
+
+	/**
 	 * Returns the Forsyth-Edwards Notation of a game.
 	 * 
 	 * FEN is a standard notation for describing a particular board
@@ -262,7 +341,7 @@ public class Game {
 	 */
 	public String getFEN() {
 		String fen = "";
-		
+
 		// Iterate through the board
 		Piece[][] board = this.getBoard();
 		int consecutiveBlankSquares = 0;
@@ -275,33 +354,34 @@ public class Game {
 			if(consecutiveBlankSquares != 0) fen += consecutiveBlankSquares;
 			if(r + 1 != board.length) fen += '/';
 		}
-		
+
 		// Determine castling rights
 		String castlingRights = 
-			   (this.whiteCanCastleKingside() ? "K" : "") + 
-			   (this.whiteCanCastleQueenside() ? "Q" : "") + 
-			   (this.blackCanCastleKingside() ? "k" : "") +
-			   (this.blackCanCastleQueenside() ? "q" : "");
+				(this.whiteCanCastleKingside() ? "K" : "") + 
+				(this.whiteCanCastleQueenside() ? "Q" : "") + 
+				(this.blackCanCastleKingside() ? "k" : "") +
+				(this.blackCanCastleQueenside() ? "q" : "");
 		if(castlingRights.equals("")) {
 			castlingRights += '-';
 		}
-		
+
 		// Add the other fields to the FEN
 		fen += ' ' + 
-			   (this.getTurn() == WHITE ? 'w' : 'b') + 
-			   ' ' +
-			   castlingRights +
-			   ' ' +
-			   (this.getEnPassantTargetSquare() == null ? '-'
-					   : this.getEnPassantTargetSquare().toAlgebraicNotation()) +
-			   ' ' +
-			   this.getHalfMoveCounter() +
-			   ' ' +
-			   this.getFullMoveCounter();
-		
+				(this.getTurn() == WHITE ? 'w' : 'b') + 
+				' ' +
+				castlingRights +
+				' ' +
+				(this.getEnPassantTargetSquare() == null ? '-'
+						: this.getEnPassantTargetSquare().toAlgebraicNotation()) +
+				' ' +
+				this.getHalfMoveCounter() +
+				' ' +
+				this.getFullMoveCounter();
+
 		return fen;
 	}
 
+	
 	public String toString() {
 		return this.getFEN();
 	}
@@ -377,12 +457,12 @@ public class Game {
 	public void setEnPassantTargetSquare(Coordinate enPassantTargetSquare) {
 		this.enPassantTargetSquare = enPassantTargetSquare;
 	}
-	
+
 
 	public String getWhiteName() {
 		return whiteName;
 	}
-	
+
 
 	public void setWhiteName(String whiteName) {
 		this.whiteName = whiteName;
