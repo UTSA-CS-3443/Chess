@@ -25,7 +25,7 @@ import java.util.Stack;
  * @see https://en.wikipedia.org/wiki/Rules_of_chess
  */
 public class Game {
-	
+
 	public static final int BOARD_ROWS = 8,
 							BOARD_COLS = 8;
 	public static final String STARTING_FEN = 
@@ -41,7 +41,12 @@ public class Game {
 	private int halfMoveCounter,
 				fullMoveCounter;
 	private Map<String, Integer> previousFensFor3FoldRepetition;
+	
+	// TODO: Which of these are we using?
+		// Blake?
 	private Stack<String> previousFenStack;
+		// Roosevelt?
+	HashMap<String, Integer> previousFENs = new HashMap<>();
 	
 	private String whiteName,
 				   blackName;
@@ -64,10 +69,19 @@ public class Game {
 		this.previousFensFor3FoldRepetition = new HashMap<>();
 		this.previousFensFor3FoldRepetition.put(this.getFenFor3FoldRepetition(), 1);
 	}
-	
+
+	/**
+	 * Tests whether a given coordinate lies within the board.
+	 * @param coordinate The coordinate to test.
+	 * @return true if the coordinate is within the board.
+	 * false otherwise.
+	 */
+	public boolean isInBounds(Coordinate coordinate) {
+		return this.isInBounds(coordinate.getRow(), coordinate.getCol());
+	}
+
 	/**
 	 * Tests whether a given row and col lie within the board.
-	 * TODO move this somewhere else?
 	 * @param row The row to test.
 	 * @param col The col to test.
 	 * @return true if the given row and col lie within
@@ -75,11 +89,11 @@ public class Game {
 	 */
 	public boolean isInBounds(int row, int col) {
 		return 0 <= row && 
-			   0 <= col && 
-			   row < this.getBoard().length &&
-			   col < this.getBoard()[row].length;
+				0 <= col && 
+				row < this.getBoard().length &&
+				col < this.getBoard()[row].length;
 	}
-	
+
 	/**
 	 * Detects if the game was set up in a legal position.
 	 * An example of an illegal position is one where the black king
@@ -93,7 +107,7 @@ public class Game {
 		
 		// There should be exactly 1 white and black king
 		if(pieceCounts.get(WHITE_KING) != 1 ||
-		   pieceCounts.get(BLACK_KING) != 1) {
+				pieceCounts.get(BLACK_KING) != 1) {
 			return false;
 		}
 		
@@ -102,6 +116,34 @@ public class Game {
 		// All else passed, position is legal
 		return true;
 	}
+	// Roosevelt: isLegalPosition
+	/*
+		
+	 * Detects if the game was set up in a legal position.
+	 * An example of an illegal position is one where the black king
+	 * is in check while it is White's turn.
+	 * Another example is there is not exactly 1 white and black king.
+	 * @return true, if the current position is legal, otherwise false.
+	
+	public boolean isLegalPosition() {
+		// Set up counts for pieces
+		HashMap<Piece, Integer> pieceCounts = new HashMap<>();
+		for(Piece piece : ALL_PIECES) {
+			pieceCounts.put(piece, 0);
+		}
+		int totalCountWhite = 0,
+				totalCountBlack = 0;
+
+		// There should be exactly 1 white and black king
+		if(pieceCounts.get(WHITE_KING) != 1 ||
+				pieceCounts.get(BLACK_KING) != 1) {
+			return false;
+		}
+
+		// All else passed, position is legal
+		return true;
+	}
+	 */
 	
 	/**
 	 * Returns the list of pseudo-legal moves for a player
@@ -534,7 +576,7 @@ public class Game {
 	public Piece getPieceAt(Coordinate coordinate) {
 		return this.getPieceAt(coordinate.getRow(), coordinate.getCol());
 	}
-	
+
 	/**
 	 * Gets the piece at a specific row and col.
 	 * Note that (0, 0) is the top-left corner.
@@ -581,7 +623,15 @@ public class Game {
 		return this.getLegalMoves().size() == 0 &&
 				this.isInCheck(this.getTurn());
 	}
-	
+
+	/**
+	 *
+	 * 
+	 */
+	public void changeTurn() {
+
+	}
+
 	/**
 	 * A draw may be achieved in several ways:
 	 * 
@@ -710,7 +760,7 @@ public class Game {
 	public void loadFromFEN(String fen) {
 		// Split the FEN into parts
 		String[] parts = fen.split(" ");
-		
+
 		// Set pieces from part 1 of FEN
 		String[] pieces = parts[0].split("/");
 		Piece[][] board = new Piece[8][8];
@@ -725,23 +775,23 @@ public class Game {
 			}
 		}
 		this.setBoard(board);
-		
+
 		// Get the current turn
 		this.setTurn(parts[1].equals("w") ? WHITE : BLACK);
-		
+
 		// Get castling rights
 		this.setWhiteCanCastleKingside(parts[2].contains("K"));
 		this.setWhiteCanCastleQueenside(parts[2].contains("Q"));
 		this.setBlackCanCastleKingside(parts[2].contains("k"));
 		this.setBlackCanCastleQueenside(parts[2].contains("q"));
-		
+
 		// Get halfmove counter
 		this.setHalfMoveCounter(Integer.parseInt(parts[4]));
-		
+
 		// Get fullmove counter
 		this.setFullMoveCounter(Integer.parseInt(parts[5]));
 	}
-	
+
 	/**
 	 * Returns the Forsyth-Edwards Notation of a game.
 	 * 
@@ -796,7 +846,7 @@ public class Game {
 	 */
 	public String getFEN() {
 		String fen = "";
-		
+
 		// Iterate through the board
 		Piece[][] board = this.getBoard();
 		int consecutiveBlankSquares = 0;
@@ -819,17 +869,17 @@ public class Game {
 			}
 			if(r + 1 != board.length) fen += '/';
 		}
-		
+
 		// Determine castling rights
 		String castlingRights = 
-			   (this.whiteCanCastleKingside() ? "K" : "") + 
-			   (this.whiteCanCastleQueenside() ? "Q" : "") + 
-			   (this.blackCanCastleKingside() ? "k" : "") +
-			   (this.blackCanCastleQueenside() ? "q" : "");
+				(this.whiteCanCastleKingside() ? "K" : "") + 
+				(this.whiteCanCastleQueenside() ? "Q" : "") + 
+				(this.blackCanCastleKingside() ? "k" : "") +
+				(this.blackCanCastleQueenside() ? "q" : "");
 		if(castlingRights.equals("")) {
 			castlingRights += '-';
 		}
-		
+
 		// Add the other fields to the FEN
 		fen += " " + 
 			   (this.getTurn() == WHITE ? 'w' : 'b') + 
@@ -845,6 +895,7 @@ public class Game {
 		
 		return fen;
 	}
+
 	
 	/**
 	 * Returns a String representation of the game, which is
@@ -1192,4 +1243,3 @@ public class Game {
 		this.previousFensFor3FoldRepetition = previousFensFor3FoldRepetition;
 	}
 }
-
