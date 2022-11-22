@@ -23,18 +23,18 @@ import java.util.Map;
  */
 public enum Piece implements Movable {
 	
-	WHITE_KING (WHITE, 'K', KING_MOVE_GENERATOR),
-	WHITE_QUEEN (WHITE, 'Q', QUEEN_MOVE_GENERATOR),
-	WHITE_ROOK (WHITE, 'R', ROOK_MOVE_GENERATOR),
-	WHITE_BISHOP (WHITE, 'B', BISHOP_MOVE_GENERATOR),
-	WHITE_KNIGHT (WHITE, 'N', KNIGHT_MOVE_GENERATOR),
-	WHITE_PAWN (WHITE, 'P', PAWN_MOVE_GENERATOR),
-	BLACK_KING (BLACK, 'k', KING_MOVE_GENERATOR),
-	BLACK_QUEEN (BLACK, 'q', QUEEN_MOVE_GENERATOR),
-	BLACK_ROOK (BLACK, 'r', ROOK_MOVE_GENERATOR),
-	BLACK_BISHOP (BLACK, 'b', BISHOP_MOVE_GENERATOR),
-	BLACK_KNIGHT (BLACK, 'n', KNIGHT_MOVE_GENERATOR),
-	BLACK_PAWN (BLACK, 'p', PAWN_MOVE_GENERATOR);
+	WHITE_KING (WHITE, 'K', KING_MOVE_GENERATOR,"Chess/src/Images/WhiteKing.png"),
+	WHITE_QUEEN (WHITE, 'Q', QUEEN_MOVE_GENERATOR,"Chess/src/Images/WhiteQueen.png"),
+	WHITE_ROOK (WHITE, 'R', ROOK_MOVE_GENERATOR,"Chess/src/Images/WhiteRook.png"),
+	WHITE_BISHOP (WHITE, 'B', BISHOP_MOVE_GENERATOR,"Chess/src/Images/WhiteBishop.png"),
+	WHITE_KNIGHT (WHITE, 'N', KNIGHT_MOVE_GENERATOR,"Chess/src/Images/WhiteKnight.png"),
+	WHITE_PAWN (WHITE, 'P', PAWN_MOVE_GENERATOR,"Chess/src/Images/WhitePawn.png"),
+	BLACK_KING (BLACK, 'k', KING_MOVE_GENERATOR,"Chess/src/Images/BlackKing.png"),
+	BLACK_QUEEN (BLACK, 'q', QUEEN_MOVE_GENERATOR,"Chess/src/Images/BlackQueen.png"),
+	BLACK_ROOK (BLACK, 'r', ROOK_MOVE_GENERATOR,"Chess/src/Images/BlackRook.png"),
+	BLACK_BISHOP (BLACK, 'b', BISHOP_MOVE_GENERATOR,"Chess/src/Images/BlackRook.png"),
+	BLACK_KNIGHT (BLACK, 'n', KNIGHT_MOVE_GENERATOR,"Chess/src/Images/BlackKnight.png"),
+	BLACK_PAWN (BLACK, 'p', PAWN_MOVE_GENERATOR,"Chess/src/Images/BlackPawn.png");
 	
 	public static final Piece[] ALL_PIECES = {WHITE_KING, WHITE_QUEEN, WHITE_ROOK, WHITE_BISHOP, WHITE_KNIGHT,
 			WHITE_PAWN, BLACK_KING, BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT, BLACK_PAWN};
@@ -49,11 +49,13 @@ public enum Piece implements Movable {
 	private final Color color;
 	private final char character;
 	private final MoveGenerator moveGenerator;
+	private final String imageURL;
 
-	private Piece(Color color, char character, MoveGenerator moveGenerator) {
+	private Piece(Color color, char character, MoveGenerator moveGenerator,String imageURL) {
 	    this.color = color;
 	    this.character = character;
 	    this.moveGenerator = moveGenerator;
+	    this.imageURL = imageURL;
 	}
 	
 	/**
@@ -88,6 +90,14 @@ public enum Piece implements Movable {
 	 */
 	public char getCharacter() {
 		return this.character;
+	}
+	
+	/**
+	 * Gets the images URL for the piece
+	 * @return the image URL for the piece
+	 */
+	public String getImageURL() {
+		return this.imageURL;
 	}
 	
 	@Override
