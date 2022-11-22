@@ -53,7 +53,12 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
             for (int col = 0; col < 8; col ++) {
                 MyButton tile = new MyButton(row,col);
                 buttons[row][col] = tile;
-                tile.setOnAction(event -> tile.handle(event));//CHECK HERE FOR ERROR....Maybe should go into the handle method?
+                tile.setOnAction(new EventHandler<ActionEvent>() {
+                	@Override
+                	public void handle(ActionEvent e) {
+                		tile.handle(e);
+                	}
+                });//CHECK HERE FOR ERROR....Maybe should go into the handle method?
                 String color ;
                 if ((row + col) % 2 == 0) {
                     color = "white";
@@ -76,6 +81,7 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 	@Override
 	public void handle(ActionEvent event) {
 		// TODO Auto-generated method stub
+		
 		
 	}
 }
@@ -242,17 +248,25 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		int row = this.getRow();
 		int col = this.getCol();
 		
+		
 		if(this.isHighLighted()) {
 			game.pushMove(new Move(lastSquareClicked.getRow(),
 								   lastSquareClicked.getCol(),
-								   row,
-								   col));
+								   this.getRow(),
+								   this.getCol()));
+			System.out.println("Changed from Piece:" +game.getPieceAt(lastSquareClicked.getRow(),lastSquareClicked.getCol())+ "Row: "+ lastSquareClicked.getRow() 
+			+ " Col: " + lastSquareClicked.getCol()  +
+								"piece at new location is: " + game.getPieceAt(this.getRow(),this.getCol()) + " btw this.getRow() is: " +
+								this.getRow() + " and this.getCol is: " + this.getCol());
 			lastSquareClicked = null;
 			
 			//update graphics
 			for(int r = 0; r < 8; r++) {
 				for(int c = 0; c < 8; c++) {
 					ChessBoardController.buttons[r][c].updateImage();
+					if(ChessBoardController.buttons[r][c].getGraphic() != null) {
+					//System.out.println("Row: " + r + "Col: " + c + " is " + game.getPieceAt(r, c));
+					}
 				}
 			}
 			
@@ -265,16 +279,20 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 			else if(game.isDraw()) {
 				//change to draw PopUp
 			}
+			resetHighLightedSquares();
 		}
 		
 		else {
+		
 		resetHighLightedSquares();
-		List<Move> legalMoves = game.getLegalMoves();
+		Piece piece = game.getPieceAt(row, col);
+		Coordinate cord = new Coordinate(row,col);
+		List<Move> legalMoves = piece.getLegalMoves(game, cord);
 		for(Move move: legalMoves){
 			int r = move.getToRow();
 			int c = move.getToCol();
 			
-			this.highLightSquare(r,c);
+			highLightSquare(r,c);
 		}
 		lastSquareClicked = this;
 		}
@@ -317,6 +335,6 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		Effect shadow = new DropShadow();
 		ChessBoardController.buttons[r][c].setEffect(shadow);
 		//System.out.println("Row: " + r + "Col: " + c +"is Highlighted");
-		return this.isHighlighted = true;
+		return ChessBoardController.buttons[r][c].isHighlighted = true;
 	}
 }

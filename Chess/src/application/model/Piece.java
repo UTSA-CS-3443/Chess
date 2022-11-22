@@ -32,7 +32,7 @@ public enum Piece implements Movable {
 	BLACK_KING (BLACK, 'k', KING_MOVE_GENERATOR,"Chess/src/Images/BlackKing.png"),
 	BLACK_QUEEN (BLACK, 'q', QUEEN_MOVE_GENERATOR,"Chess/src/Images/BlackQueen.png"),
 	BLACK_ROOK (BLACK, 'r', ROOK_MOVE_GENERATOR,"Chess/src/Images/BlackRook.png"),
-	BLACK_BISHOP (BLACK, 'b', BISHOP_MOVE_GENERATOR,"Chess/src/Images/BlackRook.png"),
+	BLACK_BISHOP (BLACK, 'b', BISHOP_MOVE_GENERATOR,"Chess/src/Images/BlackBishop.png"),
 	BLACK_KNIGHT (BLACK, 'n', KNIGHT_MOVE_GENERATOR,"Chess/src/Images/BlackKnight.png"),
 	BLACK_PAWN (BLACK, 'p', PAWN_MOVE_GENERATOR,"Chess/src/Images/BlackPawn.png");
 	
