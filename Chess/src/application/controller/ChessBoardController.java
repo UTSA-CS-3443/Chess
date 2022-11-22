@@ -298,7 +298,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 				ChessBoardController.popup.show(Main.stage);
 			}
 			
-			else if(game.isDraw() || test ==2) {
+			else if(game.isDraw()) {
 				Label label = new Label("Draw");
 				label.setPrefWidth(400);
 				label.setPrefHeight(200);
