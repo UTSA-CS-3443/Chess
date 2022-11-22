@@ -2,6 +2,7 @@ package application.controller;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
@@ -9,14 +10,21 @@ import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import application.Main;
 import application.model.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Font;
+import javafx.stage.Popup;
+import javafx.scene.paint.Color;
 
 
 /**
@@ -27,18 +35,21 @@ import javafx.scene.layout.GridPane;
 public class ChessBoardController implements EventHandler<ActionEvent>, Initializable{
 	Game game = GameController.game;
 	public static MyButton[][] buttons = new MyButton[8][8];
-
+	static Popup popup = new Popup();
+		@FXML
+		private Button homeButton;
 	    @FXML
 	    private Label player1Label;
 
 	    @FXML
-	    private GridPane stageBase;
+	     public static GridPane stageBase;
 
 	    @FXML
 	    private Label player2Label;
 
 	    @FXML
-	    private GridPane ChessBoard;
+	     GridPane ChessBoard;
+	    
 
 	/**
 	 *initializes the board to its starting point
@@ -78,11 +89,23 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
         }
 	}
 
+	/**
+	 *handles the event that the home button is pressed
+	 */
 	@Override
 	public void handle(ActionEvent event) {
 		// TODO Auto-generated method stub
-		
-		
+		popup.hide();
+		try {
+			FXMLLoader loader = new FXMLLoader();
+			loader.setLocation(getClass().getResource("../view/Main.fxml"));
+			Scene scene2;
+			scene2 = new Scene(loader.load());
+			Main.stage.setScene(scene2);
+			Main.stage.show();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
 	
@@ -247,14 +270,12 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 	public void handle(ActionEvent event){
 		int row = this.getRow();
 		int col = this.getCol();
-		
-		
+		int test = 2;
 		if(this.isHighLighted()) {
 			game.pushMove(new Move(lastSquareClicked.getRow(),
 								   lastSquareClicked.getCol(),
 								   this.getRow(),
 								   this.getCol()));
-			//System.out.println("piece at new location is: " + game.getPieceAt(this.getRow(),this.getCol()));
 			lastSquareClicked = null;
 			
 			//update graphics
@@ -262,19 +283,30 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 				for(int c = 0; c < 8; c++) {
 					ChessBoardController.buttons[r][c].updateImage();
 					if(ChessBoardController.buttons[r][c].getGraphic() != null) {
-					//System.out.println("Row: " + r + "Col: " + c + " is " + game.getPieceAt(r, c));
 					}
 				}
 			}
 			
 			if(game.isCheckmate()) {
-				//change to CheckMate PopUp
-				//Maybe make the PopUp a label that appears in the center of the screen
-				//put home/reset button on the chess board 
+				Label label = new Label("CheckMate");
+				label.setPrefWidth(400);
+				label.setPrefHeight(200);
+				label.setAlignment(Pos.BOTTOM_CENTER);
+				label.setFont(new Font(50));
+				label.setTextFill(Color.valueOf("Black"));
+				ChessBoardController.popup.getContent().add(label);
+				ChessBoardController.popup.show(Main.stage);
 			}
 			
-			else if(game.isDraw()) {
-				//change to draw PopUp
+			else if(game.isDraw() || test ==2) {
+				Label label = new Label("Draw");
+				label.setPrefWidth(400);
+				label.setPrefHeight(200);
+				label.setAlignment(Pos.BOTTOM_CENTER);
+				label.setFont(new Font(50));
+				label.setTextFill(Color.valueOf("Black"));
+				ChessBoardController.popup.getContent().add(label);
+				ChessBoardController.popup.show(Main.stage);
 			}
 			resetHighLightedSquares();
 		}

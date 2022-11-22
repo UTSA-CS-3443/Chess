@@ -69,5 +69,6 @@
       <Label text="F" translateX="282.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP" />
       <Label text="G" translateX="335.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP" />
       <Label text="H" translateX="389.0" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.valignment="TOP" />
+      <Button fx:id="homeButton" contentDisplay="CENTER" mnemonicParsing="false" onAction="#handle" text="Home" textAlignment="CENTER" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
    </children>
 </GridPane>
