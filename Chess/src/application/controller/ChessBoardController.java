@@ -254,10 +254,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 								   lastSquareClicked.getCol(),
 								   this.getRow(),
 								   this.getCol()));
-			System.out.println("Changed from Piece:" +game.getPieceAt(lastSquareClicked.getRow(),lastSquareClicked.getCol())+ "Row: "+ lastSquareClicked.getRow() 
-			+ " Col: " + lastSquareClicked.getCol()  +
-								"piece at new location is: " + game.getPieceAt(this.getRow(),this.getCol()) + " btw this.getRow() is: " +
-								this.getRow() + " and this.getCol is: " + this.getCol());
+			//System.out.println("piece at new location is: " + game.getPieceAt(this.getRow(),this.getCol()));
 			lastSquareClicked = null;
 			
 			//update graphics
