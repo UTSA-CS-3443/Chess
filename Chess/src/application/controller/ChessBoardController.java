@@ -56,7 +56,7 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
-		// TODO Auto-generated method stub
+
 		player1Label.setText(game.getWhiteName());
 		player2Label.setText(game.getBlackName());
 		
@@ -94,7 +94,6 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 	 */
 	@Override
 	public void handle(ActionEvent event) {
-		// TODO Auto-generated method stub
 		popup.hide();
 		try {
 			FXMLLoader loader = new FXMLLoader();
@@ -270,7 +269,6 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 	public void handle(ActionEvent event){
 		int row = this.getRow();
 		int col = this.getCol();
-		int test = 2;
 		if(this.isHighLighted()) {
 			game.pushMove(new Move(lastSquareClicked.getRow(),
 								   lastSquareClicked.getCol(),
