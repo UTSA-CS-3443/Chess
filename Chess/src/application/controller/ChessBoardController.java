@@ -17,6 +17,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.effect.Effect;
+import javafx.scene.effect.Glow;
+import javafx.scene.effect.InnerShadow;
+import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import application.Main;
@@ -359,9 +362,9 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 	 * @return boolean  the isHighlighted boolean value now set to true
 	 */
 	public boolean highLightSquare(int r, int c) {
-		Effect shadow = new DropShadow();
+		Shadow shadow = new Shadow();
+		shadow.setColor(Color.YELLOW);
 		ChessBoardController.buttons[r][c].setEffect(shadow);
-		//System.out.println("Row: " + r + "Col: " + c +"is Highlighted");
 		return ChessBoardController.buttons[r][c].isHighlighted = true;
 	}
 }
