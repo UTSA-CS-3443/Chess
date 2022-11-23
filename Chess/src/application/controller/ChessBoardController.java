@@ -15,10 +15,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Effect;
-import javafx.scene.effect.Glow;
-import javafx.scene.effect.InnerShadow;
 import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -313,7 +309,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		}
 		
 		else {
-		
+		try {
 		resetHighLightedSquares();
 		Piece piece = game.getPieceAt(row, col);
 		Coordinate cord = new Coordinate(row,col);
@@ -325,6 +321,9 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 			highLightSquare(r,c);
 		}
 		lastSquareClicked = this;
+		}catch(NullPointerException e) {
+					
+			}
 		}
 	}
 	
