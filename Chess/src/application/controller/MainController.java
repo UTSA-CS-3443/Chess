@@ -36,7 +36,7 @@ public class MainController implements EventHandler<ActionEvent> {
 
 	    @FXML
 	    public void handle(ActionEvent event) {
-	    	 GameController.game = new Game(player1.getText(),player2.getText());
+	    	GameController.game = new Game(player1.getText(), player2.getText());
 	    	//create method to hold playerNames here 
 	    	try {
 				FXMLLoader loader = new FXMLLoader();
