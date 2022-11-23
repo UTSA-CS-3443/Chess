@@ -109,11 +109,6 @@ public class Move {
 		return this.getToCoordinate().getRow();
 	}
 	
-	// TODO: is this method needed in this class?
-	public boolean isLegal() {
-		return false;
-	}
-
 	/**
 	 * Returns the destination column.
 	 * @return The destination column.
