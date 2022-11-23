@@ -82,4 +82,17 @@ public class Coordinate {
 	public int getCol() {
 		return this.col;
 	}
+
+	/**
+	 * Returns true if the two coordinates have the same row and column.
+	 * @param other The other coordinate to compare to.
+	 * @return true if the two coordinates have the same row and column.
+	 * false otherwise.
+	 */
+	public boolean equals(Coordinate other) {
+		if(other == null) {
+			return false;
+		}
+		return this.getRow() == other.getRow() && this.getCol() == other.getCol();
+	}
 }

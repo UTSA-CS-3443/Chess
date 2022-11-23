@@ -145,120 +145,15 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 	 * @param piece the piece on the board(Piece)
 	 * @return ImageView(image) the image of the selected piece
 	 */
-	public ImageView getImageFromPiece(Piece piece){
-		switch(piece) {
-		case WHITE_KING:
+	public ImageView getImageFromPiece(Piece piece) {
+		if(piece != null) {
 			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
+				return new ImageView(new Image(new FileInputStream(piece.getImageURL())));
+			} catch(FileNotFoundException e) {
 				e.printStackTrace();
-			} 
-			
-		case WHITE_QUEEN:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case WHITE_ROOK:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case WHITE_BISHOP:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case WHITE_KNIGHT:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case WHITE_PAWN:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case BLACK_KING:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case BLACK_QUEEN:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case BLACK_ROOK:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case BLACK_BISHOP:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case BLACK_KNIGHT:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		case BLACK_PAWN:
-			try {
-				InputStream stream = new FileInputStream(piece.getImageURL());
-				Image image = new Image(stream);
-				return new ImageView(image);
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} 
-			
-		default:
-			System.out.println("ERROR IN UPDATE IMAGE");
-			return null;
+			}
 		}
+		return null;
 	}
 	
 	/**
@@ -269,10 +164,12 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		int row = this.getRow();
 		int col = this.getCol();
 		if(this.isHighLighted()) {
-			game.pushMove(new Move(lastSquareClicked.getRow(),
-								   lastSquareClicked.getCol(),
-								   this.getRow(),
-								   this.getCol()));
+			Move move = new Move(lastSquareClicked.getRow(),
+					   lastSquareClicked.getCol(),
+					   this.getRow(),
+					   this.getCol());
+			game.pushMove(move);
+			System.out.println(game);
 			lastSquareClicked = null;
 			
 			//update graphics

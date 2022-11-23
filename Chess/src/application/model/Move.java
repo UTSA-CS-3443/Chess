@@ -27,6 +27,20 @@ public class Move {
 	}
 	
 	/**
+	 * Compares two moves and returns true if the coordinates are equal.
+	 * @param other The other Move to compare to.
+	 * @return true if the moves have the same source and destination
+	 * coordinates. false otherwise.
+	 */
+	public boolean equals(Move other) {
+		if(other == null) {
+			return false;
+		}
+		return this.getFromCoordinate().equals(other.getFromCoordinate()) &&
+				this.getToCoordinate().equals(other.getToCoordinate());
+	}
+	
+	/**
 	 * Returns the toString() method of the source coordinate
 	 * followed by the toString() method of the destination
 	 * coordinate.
