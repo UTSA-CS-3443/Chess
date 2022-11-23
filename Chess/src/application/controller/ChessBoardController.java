@@ -56,8 +56,8 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 
-		player1Label.setText(game.getWhiteName());
-		player2Label.setText(game.getBlackName());
+		player2Label.setText(game.getWhiteName());
+		player1Label.setText(game.getBlackName());
 		
 		for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col ++) {
