@@ -41,12 +41,7 @@ public class Game {
 	private int halfMoveCounter,
 				fullMoveCounter;
 	private Map<String, Integer> previousFensFor3FoldRepetition;
-	
-	// TODO: Which of these are we using?
-		// Blake?
 	private Stack<String> previousFenStack;
-		// Roosevelt?
-	HashMap<String, Integer> previousFENs = new HashMap<>();
 	
 	private String whiteName,
 				   blackName;
