@@ -52,7 +52,11 @@ public class Game {
 				   blackName;
 	
 	public Game() {
-		this("White", "Black");
+		this(Game.STARTING_FEN);
+	}
+	
+	public Game(String fen) {
+		this(fen, "White", "Black");
 	}
 	
 	public Game(String whiteName, String blackName) {
@@ -305,11 +309,12 @@ public class Game {
 	 *  assumes that the piece moves the right way.
 	 *  2. The coordinates are off the board.
 	 *  3. There is no piece on the from square.
-	 *  4. There is an allied piece on the to square.
-	 *  5. The move puts the king in check.
-	 *  6. The move violates castling rules/rights.
-	 *  7. A pawn moves forward with something in the way.
-	 *  8. A pawn tries to capture with no target
+	 *  4. The player tries moving an enemy piece.
+	 *  5. There is an allied piece on the to square.
+	 *  6. The move puts the king in check.
+	 *  7. The move violates castling rules/rights.
+	 *  8. A pawn moves forward with something in the way.
+	 *  9. A pawn tries to capture with no target
 	 *  (the target for en-passant is not on the square the
 	 *  pawn moves to.)
 	 */
@@ -330,6 +335,11 @@ public class Game {
 			return false;
 		}
 		
+		// Check moved piece is not other side's piece
+		if(movedPiece.getColor() != this.getTurn()) {
+			return false;
+		}
+		
 		// Check for friendly captures
 		if(capturedPiece != null && capturedPiece.isAlliedWith(movedPiece)) {
 			return false;
@@ -338,31 +348,42 @@ public class Game {
 		// Check pawn moves
 		if(movedPiece == WHITE_PAWN || movedPiece == BLACK_PAWN) {
 			if(colDifference == 0) {
-				// Check nothing is in the way of pawn moving forward
-				if(capturedPiece != null || Math.abs(rowDifference) == 2 &&
-						this.getPieceAt(move.getFromCoordinate().offset(rowDifference / 2, 0)) != null) {
+				// Pawn moves forward; cannot make capture
+				if(capturedPiece != null) {
 					return false;
+				} else if (Math.abs(rowDifference) == 2) {
+					/* Check pawns jumping 2 spaces;
+					 * space before must be clear and
+					 * pawn must be on starting row.
+					 */
+					if(this.getPieceAt(move.getFromCoordinate().offset(rowDifference / 2, 0)) != null ||
+							move.getFromRow() != (movedPiece == WHITE_PAWN ? 6 : 1)) {
+						return false;
+					}
 				}
-			} else if((this.getEnPassantTargetSquare() == null || 
-					!move.getToCoordinate().equals(this.getEnPassantTargetSquare()) &&
-					this.getPieceAt(move.getToCoordinate()) == null)) {
+			} else if(capturedPiece == null && 
+					!move.getToCoordinate().equals(this.getEnPassantTargetSquare())) {
+				/* Pawn captures a piece;
+				 * must be a piece on the captured square or
+				 * the move must be en passant.
+				 */
 				return false;
 			}
 		}
 		
 		// Check castling
 		Coordinate kingLocation = this.getKingLocation(movedPiece.getColor());
-		if((movedPiece == WHITE_KING || movedPiece == BLACK_KING) && Math.abs(rowDifference) == 2) {
+		if((movedPiece == WHITE_KING || movedPiece == BLACK_KING) && Math.abs(colDifference) == 2) {
 			// You cannot castle if you are in check.
 			if(this.isInCheck(movedPiece.getColor())) {
 				return false;
 			}
 			//squares f1/f8/c1/c8 must be clear and not attacked
-			Coordinate castlingTargetSquare = kingLocation.offset(rowDifference / 2, 0);
+			Coordinate castlingTargetSquare = kingLocation.offset(0, colDifference / 2);
 			//squares g1/g8/c1/c8 must be clear
-			Coordinate castlingTargetSquare2 = kingLocation.offset(rowDifference, 0);
+			Coordinate castlingTargetSquare2 = kingLocation.offset(0, colDifference);
 			//squares b1/b8 must be clear
-			Coordinate castlingTargetSquare3 = rowDifference != -2 ? null : kingLocation.offset(-3, 0);
+			Coordinate castlingTargetSquare3 = colDifference != -2 ? null : kingLocation.offset(0, 3);
 			if(this.getPieceAt(castlingTargetSquare) != null ||
 					this.getPieceAt(castlingTargetSquare2) != null ||
 					castlingTargetSquare3 != null && this.getPieceAt(castlingTargetSquare3) != null) {
@@ -378,11 +399,11 @@ public class Game {
 		}
 		// Check castling rights / legality
 		if(movedPiece == WHITE_KING) {
-			if(rowDifference == 2 && !this.whiteCanCastleKingside()) return false;
-			if(rowDifference == -2 && !this.whiteCanCastleQueenside()) return false;
+			if(colDifference == 2 && !this.whiteCanCastleKingside()) return false;
+			if(colDifference == -2 && !this.whiteCanCastleQueenside()) return false;
 		} else if(movedPiece == BLACK_KING) {
-			if(rowDifference == 2 && !this.blackCanCastleKingside()) return false;
-			if(rowDifference == -2 && !this.blackCanCastleQueenside()) return false;
+			if(colDifference == 2 && !this.blackCanCastleKingside()) return false;
+			if(colDifference == -2 && !this.blackCanCastleQueenside()) return false;
 		}
 		
 		/*
@@ -416,24 +437,24 @@ public class Game {
 		Coordinate destination = move.getToCoordinate();
 		Piece movedPiece = this.getPieceAt(source);
 		Piece capturedPiece = this.getPieceAt(destination);
-		this.setPieceAt(source, movedPiece);
-		this.setPieceAt(destination, null);
+		this.setPieceAt(source, null);
+		this.setPieceAt(destination, movedPiece);
+		
+		int rowDifference = move.getRowDifference();
+		int colDifference = move.getColDifference();
 		
 		// Check pawn moves
 		if(movedPiece == WHITE_PAWN || movedPiece == BLACK_PAWN) {
-			int dCol = move.getColDifference();
-			
 			// Check captures en passant
-			if(this.getEnPassantTargetSquare() != null &&
-					destination.equals(this.getEnPassantTargetSquare())) {
-				Coordinate capturedCoordinate = destination.offset(0, movedPiece == WHITE_PAWN ? 1 : -1);
+			if(destination.equals(this.getEnPassantTargetSquare())) {
+				Coordinate capturedCoordinate = destination.offset(movedPiece == WHITE_PAWN ? 1 : -1, 0);
 				capturedPiece = this.getPieceAt(capturedCoordinate);
 				this.setPieceAt(capturedCoordinate, null);
 			}
 			
 			// Check if pawn moved 2 squares for en passant
-			if(Math.abs(dCol) == 2) {
-				this.setEnPassantTargetSquare(destination.offset(0, dCol / 2));
+			if(Math.abs(rowDifference) == 2) {
+				this.setEnPassantTargetSquare(source.offset(rowDifference / 2, 0));
 			} else {
 				this.setEnPassantTargetSquare(null);
 			}
@@ -456,33 +477,38 @@ public class Game {
 		Coordinate h8 = new Coordinate(0, 7);
 		
 		// Check castling
-		int rowDifference = move.getRowDifference();
-		if(movedPiece == WHITE_KING && rowDifference == -2) {
+		if(movedPiece == WHITE_KING && colDifference == -2) {
 			// White castles queenside
 			this.setPieceAt(a1, null);
 			this.setPieceAt(7, 3, WHITE_ROOK);
-		} else if(movedPiece == WHITE_KING && rowDifference == 2) {
+		} else if(movedPiece == WHITE_KING && colDifference == 2) {
 			// White castles kingside
 			this.setPieceAt(h1, null);
 			this.setPieceAt(7,  5, WHITE_ROOK);
-		} else if(movedPiece == BLACK_KING && rowDifference == -2) {
+		} else if(movedPiece == BLACK_KING && colDifference == -2) {
 			// Black castles queenside
 			this.setPieceAt(a8, null);
 			this.setPieceAt(0, 3, BLACK_ROOK);
-		} else if(movedPiece == BLACK_KING && rowDifference == 2) {
+		} else if(movedPiece == BLACK_KING && colDifference == 2) {
 			// Black castles kingside
 			this.setPieceAt(h8, null);
 			this.setPieceAt(0, 5, BLACK_ROOK);
 		}
 		
 		// update castling rights
-		if(movedPiece == WHITE_KING || source.equals(a1) || destination.equals(a1)) {
-			this.setWhiteCanCastleQueenside(false);
-		} else if(movedPiece == WHITE_KING || source.equals(h1) || destination.equals(h1)) {
+		if(movedPiece == WHITE_KING) {
 			this.setWhiteCanCastleKingside(false);
-		} else if(movedPiece == BLACK_KING || source.equals(a8) || destination.equals(a8)) {
+			this.setWhiteCanCastleQueenside(false);
+		} else if(movedPiece == BLACK_KING) {
+			this.setBlackCanCastleKingside(false);
 			this.setBlackCanCastleQueenside(false);
-		} else if(movedPiece == BLACK_KING || source.equals(h8) || source.equals(h8)) {
+		} else if(source.equals(a1) || destination.equals(a1)) {
+			this.setWhiteCanCastleQueenside(false);
+		} else if(source.equals(h1) || destination.equals(h1)) {
+			this.setWhiteCanCastleKingside(false);
+		} else if(source.equals(a8) || destination.equals(a8)) {
+			this.setBlackCanCastleQueenside(false);
+		} else if(source.equals(h8) || source.equals(h8)) {
 			this.setBlackCanCastleKingside(false);
 		}
 		
@@ -784,6 +810,15 @@ public class Game {
 		this.setWhiteCanCastleQueenside(parts[2].contains("Q"));
 		this.setBlackCanCastleKingside(parts[2].contains("k"));
 		this.setBlackCanCastleQueenside(parts[2].contains("q"));
+		
+		// Get en passant target square
+		if(parts[3].equals("-")) {
+			this.setEnPassantTargetSquare(null);
+		} else {
+			int row = 8 - parts[3].charAt(1) + '0';
+			int col = parts[3].charAt(0) - 'a';
+			this.setEnPassantTargetSquare(new Coordinate(row, col));
+		}
 
 		// Get halfmove counter
 		this.setHalfMoveCounter(Integer.parseInt(parts[4]));
