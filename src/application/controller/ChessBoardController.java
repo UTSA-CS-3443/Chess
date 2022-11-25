@@ -119,8 +119,9 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 	private final int r;
 	private final int c;
 
-	boolean isHighlighted;
+	private boolean isHighlighted;
 	private static MyButton lastSquareClicked;
+	private boolean hasPiece;
 
 	public MyButton(int r,int c) {
 		this.r = r;
@@ -133,6 +134,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 	public void updateImage() {
 		Piece piece = game.getPieceAt(this.getRow(),this.getCol());
 		if(piece != null) {
+			this.hasPiece = true;
 			ImageView imageView = getImageFromPiece(piece);
 			this.setGraphic(imageView);
 		}
@@ -163,11 +165,12 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 	public void handle(ActionEvent event) {
 		int row = this.getRow();
 		int col = this.getCol();
+		System.out.println(row + "" + col + " is highlighted: " + this.isHighlighted);
 		if(this.isHighLighted()) {
 			Move move = new Move(lastSquareClicked.getRow(),
-					lastSquareClicked.getCol(),
-					this.getRow(),
-					this.getCol());
+									lastSquareClicked.getCol(),
+									this.getRow(),
+									this.getCol());
 			game.pushMove(move);
 			System.out.println(game);
 			lastSquareClicked = null;
@@ -203,19 +206,21 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 				ChessBoardController.popup.show(Main.stage);
 			}
 			resetHighLightedSquares();
-		}
-
-		else {
+		} else {
 			try {
 				resetHighLightedSquares();
-				Piece piece = game.getPieceAt(row, col);
-				Coordinate cord = new Coordinate(row,col);
-				List<Move> legalMoves = piece.getLegalMoves(game, cord);
-				for(Move move: legalMoves){
-					int r = move.getToRow();
-					int c = move.getToCol();
+				System.out.println();
+				System.out.println(this);
+				if(this.hasPiece) {
+					Piece piece = game.getPieceAt(row, col);
+					Coordinate cord = new Coordinate(row,col);
+					List<Move> legalMoves = piece.getLegalMoves(game, cord);
+					for(Move move: legalMoves){
+						int r = move.getToRow();
+						int c = move.getToCol();
 
-					highLightSquare(r,c);
+						highLightSquare(r,c);
+					}
 				}
 				lastSquareClicked = this;
 			} catch(NullPointerException e) {
@@ -246,8 +251,10 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		for(int r = 0; r< 8; r++) {
 			for(int c = 0; c < 8; c++) {
 				ChessBoardController.buttons[r][c].setEffect(null);
+				ChessBoardController.buttons[r][c].isHighlighted = false;
 			}
 		}
+		
 		return this.isHighlighted = false;
 	}
 
@@ -262,5 +269,11 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		shadow.setColor(Color.YELLOW);
 		ChessBoardController.buttons[r][c].setEffect(shadow);
 		return ChessBoardController.buttons[r][c].isHighlighted = true;
+	}
+
+	@Override
+	public String toString() {
+		return "MyButton [game=" + game + ", r=" + r + ", c=" + c + ", isHighlighted=" + isHighlighted + ", hasPiece="
+				+ hasPiece + "]";
 	}
 }
