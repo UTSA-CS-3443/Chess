@@ -23,18 +23,18 @@ import java.util.Map;
  */
 public enum Piece implements Movable {
 
-	WHITE_KING (WHITE, 'K', KING_MOVE_GENERATOR,"Chess/src/Images/WhiteKing.png"),
-	WHITE_QUEEN (WHITE, 'Q', QUEEN_MOVE_GENERATOR,"Chess/src/Images/WhiteQueen.png"),
-	WHITE_ROOK (WHITE, 'R', ROOK_MOVE_GENERATOR,"Chess/src/Images/WhiteRook.png"),
-	WHITE_BISHOP (WHITE, 'B', BISHOP_MOVE_GENERATOR,"Chess/src/Images/WhiteBishop.png"),
-	WHITE_KNIGHT (WHITE, 'N', KNIGHT_MOVE_GENERATOR,"Chess/src/Images/WhiteKnight.png"),
-	WHITE_PAWN (WHITE, 'P', PAWN_MOVE_GENERATOR,"Chess/src/Images/WhitePawn.png"),
-	BLACK_KING (BLACK, 'k', KING_MOVE_GENERATOR,"Chess/src/Images/BlackKing.png"),
-	BLACK_QUEEN (BLACK, 'q', QUEEN_MOVE_GENERATOR,"Chess/src/Images/BlackQueen.png"),
-	BLACK_ROOK (BLACK, 'r', ROOK_MOVE_GENERATOR,"Chess/src/Images/BlackRook.png"),
-	BLACK_BISHOP (BLACK, 'b', BISHOP_MOVE_GENERATOR,"Chess/src/Images/BlackBishop.png"),
-	BLACK_KNIGHT (BLACK, 'n', KNIGHT_MOVE_GENERATOR,"Chess/src/Images/BlackKnight.png"),
-	BLACK_PAWN (BLACK, 'p', PAWN_MOVE_GENERATOR,"Chess/src/Images/BlackPawn.png");
+	WHITE_KING (WHITE, 'K', KING_MOVE_GENERATOR,"Images/WhiteKing.png"),
+	WHITE_QUEEN (WHITE, 'Q', QUEEN_MOVE_GENERATOR,"Images/WhiteQueen.png"),
+	WHITE_ROOK (WHITE, 'R', ROOK_MOVE_GENERATOR,"Images/WhiteRook.png"),
+	WHITE_BISHOP (WHITE, 'B', BISHOP_MOVE_GENERATOR,"Images/WhiteBishop.png"),
+	WHITE_KNIGHT (WHITE, 'N', KNIGHT_MOVE_GENERATOR,"Images/WhiteKnight.png"),
+	WHITE_PAWN (WHITE, 'P', PAWN_MOVE_GENERATOR,"Images/WhitePawn.png"),
+	BLACK_KING (BLACK, 'k', KING_MOVE_GENERATOR,"Images/BlackKing.png"),
+	BLACK_QUEEN (BLACK, 'q', QUEEN_MOVE_GENERATOR,"Images/BlackQueen.png"),
+	BLACK_ROOK (BLACK, 'r', ROOK_MOVE_GENERATOR,"Images/BlackRook.png"),
+	BLACK_BISHOP (BLACK, 'b', BISHOP_MOVE_GENERATOR,"Images/BlackBishop.png"),
+	BLACK_KNIGHT (BLACK, 'n', KNIGHT_MOVE_GENERATOR,"Images/BlackKnight.png"),
+	BLACK_PAWN (BLACK, 'p', PAWN_MOVE_GENERATOR,"Images/BlackPawn.png");
 
 	public static final Piece[] ALL_PIECES = {WHITE_KING, WHITE_QUEEN, WHITE_ROOK, WHITE_BISHOP, WHITE_KNIGHT,
 			WHITE_PAWN, BLACK_KING, BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT, BLACK_PAWN};

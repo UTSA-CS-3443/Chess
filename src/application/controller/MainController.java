@@ -18,23 +18,18 @@ public class MainController implements EventHandler<ActionEvent> {
 
 	@FXML
 	private Label player1Label;
-
 	@FXML
 	private TextField player1;
-
 	@FXML
 	private TextField player2;
-
 	@FXML
 	private Button startButton;
-
 	@FXML
 	private Label gameTitle;
-
 	@FXML
 	private Label player2Label;
-
-	@FXML
+	
+	@Override
 	public void handle(ActionEvent event) {
 		GameController.game = new Game(player1.getText(), player2.getText());
 		//create method to hold playerNames here 

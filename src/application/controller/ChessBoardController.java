@@ -37,17 +37,15 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 	Game game = GameController.game;
 	public static MyButton[][] buttons = new MyButton[8][8];
 	static Popup popup = new Popup();
+	
 	@FXML
 	private Button homeButton;
 	@FXML
 	private Label player1Label;
-
 	@FXML
 	public static GridPane stageBase;
-
 	@FXML
 	private Label player2Label;
-
 	@FXML
 	GridPane ChessBoard;
 
@@ -160,9 +158,9 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 
 	/**
 	 * this method handles the actions performed on the chess board
-	 *@param event the event that a piece is selected(ActionEvent)
+	 * @param event the event that a piece is selected(ActionEvent)
 	 */
-	public void handle(ActionEvent event){
+	public void handle(ActionEvent event) {
 		int row = this.getRow();
 		int col = this.getCol();
 		if(this.isHighLighted()) {
@@ -221,7 +219,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 				}
 				lastSquareClicked = this;
 			} catch(NullPointerException e) {
-
+				e.printStackTrace();
 			}
 		}
 	}
