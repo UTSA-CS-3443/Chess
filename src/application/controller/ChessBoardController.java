@@ -207,25 +207,21 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 			}
 			resetHighLightedSquares();
 		} else {
-			try {
-				resetHighLightedSquares();
-				System.out.println();
-				System.out.println(this);
-				if(this.hasPiece) {
-					Piece piece = game.getPieceAt(row, col);
-					Coordinate cord = new Coordinate(row,col);
-					List<Move> legalMoves = piece.getLegalMoves(game, cord);
-					for(Move move: legalMoves){
-						int r = move.getToRow();
-						int c = move.getToCol();
+			resetHighLightedSquares();
+			System.out.println();
+			System.out.println(this);
+			if(this.hasPiece) {
+				Piece piece = game.getPieceAt(row, col);
+				Coordinate cord = new Coordinate(row,col);
+				List<Move> legalMoves = piece.getLegalMoves(game, cord);
+				for(Move move: legalMoves){
+					int r = move.getToRow();
+					int c = move.getToCol();
 
-						highLightSquare(r,c);
-					}
+					highLightSquare(r,c);
 				}
-				lastSquareClicked = this;
-			} catch(NullPointerException e) {
-				e.printStackTrace();
 			}
+			lastSquareClicked = this;
 		}
 	}
 
