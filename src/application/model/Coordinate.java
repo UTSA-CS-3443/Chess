@@ -14,7 +14,7 @@ package application.model;
  * @author Blake Herrera xng021
  */
 public class Coordinate {
-	
+
 	private final int row;
 	private final int col;
 
@@ -22,7 +22,7 @@ public class Coordinate {
 		this.row = row;
 		this.col = col;
 	}
-	
+
 	/**
 	 * Returns whether this coodinate lies within the bounds
 	 * of the chess board.
@@ -35,7 +35,7 @@ public class Coordinate {
 				0 <= this.getCol() &&
 				this.getCol() < Game.BOARD_COLS;
 	}
-	
+
 	/**
 	 * Returns the algebraic notation representation of this
 	 * coordinate.
@@ -43,7 +43,7 @@ public class Coordinate {
 	public String toString() {
 		return this.getAlgebraicNotation();
 	}
-	
+
 	/**
 	 * Returns the algebraic notation for this coordinate
 	 * as a String.
@@ -54,7 +54,7 @@ public class Coordinate {
 	public String getAlgebraicNotation() {
 		return (char) (this.getCol() + 'a') + "" + (8 - this.getRow());
 	}
-	
+
 	/**
 	 * Returns a new coordinate based on a row and column offset
 	 * from the current coordinate.
@@ -66,7 +66,7 @@ public class Coordinate {
 	public Coordinate offset(int dRow, int dCol) {
 		return new Coordinate(this.getRow() + dRow, this.getCol() + dCol);
 	}
-	
+
 	/**
 	 * Returns the row of the coordinate.
 	 * @return The row of the coordinate.
@@ -74,7 +74,7 @@ public class Coordinate {
 	public int getRow() {
 		return this.row;
 	}
-	
+
 	/**
 	 * Returns the column of the coordinate.
 	 * @return The column of the coordinate.

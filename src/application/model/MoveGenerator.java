@@ -15,8 +15,8 @@ import java.util.function.BiFunction;
  * @see Hopper
  */
 public abstract class MoveGenerator 
-		implements BiFunction<Game, Coordinate, List<Move>> {
-	
+implements BiFunction<Game, Coordinate, List<Move>> {
+
 	public static final MoveGenerator
 	ROOK_MOVE_GENERATOR = new Rider(new int[][] 
 			{{0, 1}, {1, 0}, {0, -1}, {-1, 0}}),
@@ -42,14 +42,14 @@ public abstract class MoveGenerator
 		public List<Move> apply(Game game, Coordinate coordinate) {
 			// Pawns do not fit within the dynamic of Riders and Hoppers.
 			List<Move> moves = new ArrayList<>();
-			
+
 			// Determine direction the pawn is moving
 			int direction = game.getPieceAt(coordinate).getColor() == WHITE ? -1 : 1;
-			
+
 			// Add pawn jumps 1 or 2 spaces to list of moves
 			moves.add(new Move(coordinate, coordinate.offset(direction, 0)));
 			moves.add(new Move(coordinate, coordinate.offset(direction * 2, 0)));
-			
+
 			// Add pawn captures to list of moves
 			moves.add(new Move(coordinate, coordinate.offset(direction, 1)));
 			moves.add(new Move(coordinate, coordinate.offset(direction, -1)));
@@ -70,13 +70,13 @@ public abstract class MoveGenerator
  * @see Movable
  */
 class Rider extends MoveGenerator {
-	
+
 	private final int[][] directions;
-	
+
 	public Rider(int[][] directions) {
 		this.directions = directions;
 	}
-	
+
 	@Override
 	public List<Move> apply(Game game, Coordinate coordinate) {
 		List<Move> moves = new ArrayList<Move>();
@@ -92,7 +92,7 @@ class Rider extends MoveGenerator {
 		}
 		return moves;
 	}
-	
+
 	/**
 	 * Gets an Nx2 dimensional array this piece may "ride".
 	 * Column 0 represents the y/row direction,
@@ -114,13 +114,13 @@ class Rider extends MoveGenerator {
  * @see Movable
  */
 class Hopper extends MoveGenerator {
-	
+
 	private final int[][] offsets;
-	
+
 	public Hopper(int[][] offsets) {
 		this.offsets = offsets;
 	}
-	
+
 	@Override
 	public List<Move> apply(Game game, Coordinate coordinate) {
 		List<Move> moves = new ArrayList<Move>();
@@ -135,7 +135,7 @@ class Hopper extends MoveGenerator {
 		}
 		return moves;
 	}
-	
+
 	/**
 	 * Gets an Nx2 dimensional array this piece may "hop".
 	 * Column 0 represents the y/row direction,

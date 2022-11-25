@@ -15,6 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
 import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -35,20 +37,20 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 	Game game = GameController.game;
 	public static MyButton[][] buttons = new MyButton[8][8];
 	static Popup popup = new Popup();
-		@FXML
-		private Button homeButton;
-	    @FXML
-	    private Label player1Label;
+	@FXML
+	private Button homeButton;
+	@FXML
+	private Label player1Label;
 
-	    @FXML
-	     public static GridPane stageBase;
+	@FXML
+	public static GridPane stageBase;
 
-	    @FXML
-	    private Label player2Label;
+	@FXML
+	private Label player2Label;
 
-	    @FXML
-	     GridPane ChessBoard;
-	    
+	@FXML
+	GridPane ChessBoard;
+
 
 	/**
 	 *initializes the board to its starting point
@@ -58,34 +60,34 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 
 		player2Label.setText(game.getWhiteName());
 		player1Label.setText(game.getBlackName());
-		
+
 		for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col ++) {
-                MyButton tile = new MyButton(row,col);
-                buttons[row][col] = tile;
-                tile.setOnAction(new EventHandler<ActionEvent>() {
-                	@Override
-                	public void handle(ActionEvent e) {
-                		tile.handle(e);
-                	}
-                });//CHECK HERE FOR ERROR....Maybe should go into the handle method?
-                String color ;
-                if ((row + col) % 2 == 0) {
-                    color = "white";
-                } else {
-                    color = "grey";
-                }
-                tile.setStyle("-fx-background-color: "+color+";");
-                tile.setMaxHeight(52);
-                tile.setMaxWidth(52);
-                tile.setMinHeight(52);
-                tile.setMinWidth(52);
-                tile.setPrefHeight(52);
-                tile.setPrefWidth(52);
-                tile.updateImage();
-                ChessBoard.add(tile, col, row);
-            }
-        }
+			for (int col = 0; col < 8; col ++) {
+				MyButton tile = new MyButton(row,col);
+				buttons[row][col] = tile;
+				tile.setOnAction(new EventHandler<ActionEvent>() {
+					@Override
+					public void handle(ActionEvent e) {
+						tile.handle(e);
+					}
+				});//CHECK HERE FOR ERROR....Maybe should go into the handle method?
+				String color ;
+				if ((row + col) % 2 == 0) {
+					color = "white";
+				} else {
+					color = "grey";
+				}
+				tile.setStyle("-fx-background-color: "+color+";");
+				tile.setMaxHeight(52);
+				tile.setMaxWidth(52);
+				tile.setMinHeight(52);
+				tile.setMinWidth(52);
+				tile.setPrefHeight(52);
+				tile.setPrefWidth(52);
+				tile.updateImage();
+				ChessBoard.add(tile, col, row);
+			}
+		}
 	}
 
 	/**
@@ -106,7 +108,7 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 		}
 	}
 }
-	
+
 
 /**
  * creates and handles the MyButton objects and their methods
@@ -114,32 +116,32 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
  *
  */
 class MyButton extends Button implements EventHandler<ActionEvent>{
-	
+
 	Game game = GameController.game;
 	private final int r;
 	private final int c;
-	
+
 	boolean isHighlighted;
 	private static MyButton lastSquareClicked;
-	
+
 	public MyButton(int r,int c) {
 		this.r = r;
 		this.c = c;
 	}
-	
+
 	/**
 	 * updates the image to its new location and removes the graphic from buttons where the piece has moved away from
 	 */
 	public void updateImage() {
 		Piece piece = game.getPieceAt(this.getRow(),this.getCol());
 		if(piece != null) {
-		ImageView imageView = getImageFromPiece(piece);
-		this.setGraphic(imageView);
+			ImageView imageView = getImageFromPiece(piece);
+			this.setGraphic(imageView);
 		}
 		else
 			this.setGraphic(null);
 	}
-		
+
 	/**
 	 * returns the proper ImageView depending on the piece selected
 	 * @param piece the piece on the board(Piece)
@@ -155,7 +157,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		}
 		return null;
 	}
-	
+
 	/**
 	 * this method handles the actions performed on the chess board
 	 *@param event the event that a piece is selected(ActionEvent)
@@ -165,13 +167,13 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		int col = this.getCol();
 		if(this.isHighLighted()) {
 			Move move = new Move(lastSquareClicked.getRow(),
-					   lastSquareClicked.getCol(),
-					   this.getRow(),
-					   this.getCol());
+					lastSquareClicked.getCol(),
+					this.getRow(),
+					this.getCol());
 			game.pushMove(move);
 			System.out.println(game);
 			lastSquareClicked = null;
-			
+
 			//update graphics
 			for(int r = 0; r < 8; r++) {
 				for(int c = 0; c < 8; c++) {
@@ -180,7 +182,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 					}
 				}
 			}
-			
+
 			if(game.isCheckmate()) {
 				Label label = new Label("CheckMate");
 				label.setPrefWidth(400);
@@ -191,7 +193,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 				ChessBoardController.popup.getContent().add(label);
 				ChessBoardController.popup.show(Main.stage);
 			}
-			
+
 			else if(game.isDraw()) {
 				Label label = new Label("Draw");
 				label.setPrefWidth(400);
@@ -204,39 +206,39 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 			}
 			resetHighLightedSquares();
 		}
-		
+
 		else {
-		try {
-		resetHighLightedSquares();
-		Piece piece = game.getPieceAt(row, col);
-		Coordinate cord = new Coordinate(row,col);
-		List<Move> legalMoves = piece.getLegalMoves(game, cord);
-		for(Move move: legalMoves){
-			int r = move.getToRow();
-			int c = move.getToCol();
-			
-			highLightSquare(r,c);
-		}
-		lastSquareClicked = this;
-		}catch(NullPointerException e) {
-					
+			try {
+				resetHighLightedSquares();
+				Piece piece = game.getPieceAt(row, col);
+				Coordinate cord = new Coordinate(row,col);
+				List<Move> legalMoves = piece.getLegalMoves(game, cord);
+				for(Move move: legalMoves){
+					int r = move.getToRow();
+					int c = move.getToCol();
+
+					highLightSquare(r,c);
+				}
+				lastSquareClicked = this;
+			} catch(NullPointerException e) {
+
 			}
 		}
 	}
-	
+
 	public int getRow() {
 		return this.r;
 	}
-	
+
 	public int getCol() {
 		return this.c;
 	}
-	
+
 	public boolean isHighLighted() {
 		//System.out.println("Checking highlighted status: " + this.isHighlighted);
 		return this.isHighlighted;
 	}
-	
+
 	/**
 	 * iterates through entire board resetting all values effect values on buttons to default value(null)
 	 * @return boolean the new isHighlighted value for each button
@@ -250,7 +252,7 @@ class MyButton extends Button implements EventHandler<ActionEvent>{
 		}
 		return this.isHighlighted = false;
 	}
-	
+
 	/**
 	 * highlights spaces of legal moves based on piece selected
 	 * @param r the row of the square to be highlighted (int)

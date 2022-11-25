@@ -7,7 +7,7 @@ package application.model;
  * @author Blake Herrera xng021
  */
 public enum Side {
-	
+
 	KINGSIDE, QUEENSIDE;
-	
+
 }

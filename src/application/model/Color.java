@@ -6,9 +6,9 @@ package application.model;
  * @author Blake Herrera xng021
  */
 public enum Color {
-	
+
 	WHITE, BLACK;
-	
+
 	/**
 	 * The invert function swaps the color, similar
 	 * to a boolean not function.

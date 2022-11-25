@@ -16,7 +16,7 @@ public class Main extends Application {
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("view/Main.fxml"));
 			root = (GridPane) loader.load();
-			
+
 			Scene scene = new Scene(root, 600, 600);
 			primaryStage.setScene(scene);
 			primaryStage.show();
@@ -25,7 +25,7 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}

@@ -30,7 +30,7 @@ public class Game {
 							BOARD_COLS = 8;
 	public static final String STARTING_FEN = 
 			"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-	
+
 	private Piece[][] board;
 	private Color turn;
 	private boolean whiteCanCastleKingside,
@@ -41,28 +41,23 @@ public class Game {
 	private int halfMoveCounter,
 				fullMoveCounter;
 	private Map<String, Integer> previousFensFor3FoldRepetition;
-	
-	// TODO: Which of these are we using?
-		// Blake?
 	private Stack<String> previousFenStack;
-		// Roosevelt?
-	HashMap<String, Integer> previousFENs = new HashMap<>();
-	
+
 	private String whiteName,
 				   blackName;
 	
 	public Game() {
 		this(Game.STARTING_FEN);
 	}
-	
+
 	public Game(String fen) {
 		this(fen, "White", "Black");
 	}
-	
+
 	public Game(String whiteName, String blackName) {
 		this(Game.STARTING_FEN, whiteName, blackName);
 	}
-	
+
 	// TODO check if illegal starting position
 	public Game(String fen, String whiteName, String blackName) {
 		this.loadFromFEN(fen);
@@ -107,28 +102,28 @@ public class Game {
 	 */
 	public boolean isLegalPosition() {
 		// Set up counts for pieces
-		 Map<Piece, Integer> pieceCounts = this.getPieceCount();
+		Map<Piece, Integer> pieceCounts = this.getPieceCount();
 		
 		// There should be exactly 1 white and black king
 		if(pieceCounts.get(WHITE_KING) != 1 ||
 				pieceCounts.get(BLACK_KING) != 1) {
 			return false;
 		}
-		
+
 		// TODO no pawns on 1st or last row?
-		
+
 		// All else passed, position is legal
 		return true;
 	}
 	// Roosevelt: isLegalPosition
 	/*
-		
+
 	 * Detects if the game was set up in a legal position.
 	 * An example of an illegal position is one where the black king
 	 * is in check while it is White's turn.
 	 * Another example is there is not exactly 1 white and black king.
 	 * @return true, if the current position is legal, otherwise false.
-	
+
 	public boolean isLegalPosition() {
 		// Set up counts for pieces
 		HashMap<Piece, Integer> pieceCounts = new HashMap<>();
@@ -148,7 +143,7 @@ public class Game {
 		return true;
 	}
 	 */
-	
+
 	/**
 	 * Returns the list of pseudo-legal moves for a player
 	 * in the current position.
@@ -169,7 +164,7 @@ public class Game {
 		}
 		return moves;
 	}
-	
+
 	/**
 	 * Returns the list of legal moves for this position.
 	 * @return The list of legal moves for this position.
@@ -185,7 +180,7 @@ public class Game {
 		}
 		return moves;
 	}
-	
+
 	/**
 	 * Returns an Iterable which iterates over each of the 64 squares,
 	 * in order from left to right, then top to bottom.
@@ -193,11 +188,11 @@ public class Game {
 	 */
 	public static Iterable<Coordinate> coordinateIterator() {
 		return new Iterable<Coordinate>() {
-			
+
 			@Override
 			public Iterator<Coordinate> iterator() {
 				return new Iterator<Coordinate>() {
-					
+
 					private int r = 0;
 					private int c = 0;
 
@@ -215,12 +210,12 @@ public class Game {
 						}
 						return coordinate;
 					}
-					
+
 				};
 			}
 		};
 	}
-	
+
 	/**
 	 * Returns an Iterable which iterates over each piece on
 	 * the board, from left to right, then top to bottom.
@@ -234,10 +229,10 @@ public class Game {
 			@Override
 			public Iterator<Piece> iterator() {
 				return new Iterator<Piece>() {
-					
+
 					private int r = 0;
 					private int c = 0;
-					
+
 					{
 						while(r < Game.BOARD_ROWS &&
 								Game.this.getPieceAt(r, c) == null) {
@@ -269,7 +264,7 @@ public class Game {
 			}
 		};
 	}
-	
+
 	/**
 	 * This method returns true if the king of the given color
 	 * is in check.
@@ -285,7 +280,7 @@ public class Game {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * This method returns a Coordinate for the square the king
 	 * of the given color sits on.
@@ -324,27 +319,27 @@ public class Game {
 				!move.getToCoordinate().isInBounds()) {
 			return false;
 		}
-		
+
 		Piece movedPiece = this.getPieceAt(move.getFromCoordinate());
 		Piece capturedPiece = this.getPieceAt(move.getToCoordinate());
 		int rowDifference = move.getRowDifference();
 		int colDifference = move.getColDifference();
-		
+
 		// Check moved piece is not null
 		if(movedPiece == null) {
 			return false;
 		}
-		
+
 		// Check moved piece is not other side's piece
 		if(movedPiece.getColor() != this.getTurn()) {
 			return false;
 		}
-		
+
 		// Check for friendly captures
 		if(capturedPiece != null && capturedPiece.isAlliedWith(movedPiece)) {
 			return false;
 		}
-		
+
 		// Check pawn moves
 		if(movedPiece == WHITE_PAWN || movedPiece == BLACK_PAWN) {
 			if(colDifference == 0) {
@@ -370,7 +365,7 @@ public class Game {
 				return false;
 			}
 		}
-		
+
 		// Check castling
 		Coordinate kingLocation = this.getKingLocation(movedPiece.getColor());
 		if((movedPiece == WHITE_KING || movedPiece == BLACK_KING) && Math.abs(colDifference) == 2) {
@@ -405,7 +400,7 @@ public class Game {
 			if(colDifference == 2 && !this.blackCanCastleKingside()) return false;
 			if(colDifference == -2 && !this.blackCanCastleQueenside()) return false;
 		}
-		
+
 		/*
 		 * Check if the king would be in check by putting the move on the board
 		 * and checking the pseudo-legal moves for his opponent. If there is a
@@ -419,11 +414,11 @@ public class Game {
 			return false;
 		}
 		this.popMove();
-		
+
 		// Everything passed, move is legal.
 		return true;
 	}
-	
+
 	/**
 	 * This method puts a legal move onto the board and handles all
 	 * special moves such as en passant and castling.
@@ -439,10 +434,10 @@ public class Game {
 		Piece capturedPiece = this.getPieceAt(destination);
 		this.setPieceAt(source, null);
 		this.setPieceAt(destination, movedPiece);
-		
+
 		int rowDifference = move.getRowDifference();
 		int colDifference = move.getColDifference();
-		
+
 		// Check pawn moves
 		if(movedPiece == WHITE_PAWN || movedPiece == BLACK_PAWN) {
 			// Check captures en passant
@@ -451,14 +446,14 @@ public class Game {
 				capturedPiece = this.getPieceAt(capturedCoordinate);
 				this.setPieceAt(capturedCoordinate, null);
 			}
-			
+
 			// Check if pawn moved 2 squares for en passant
 			if(Math.abs(rowDifference) == 2) {
 				this.setEnPassantTargetSquare(source.offset(rowDifference / 2, 0));
 			} else {
 				this.setEnPassantTargetSquare(null);
 			}
-			
+
 			/*
 			 * Check pawn promotions
 			 * TODO player may select which piece to promote to
@@ -470,12 +465,12 @@ public class Game {
 				this.setPieceAt(destination, WHITE_QUEEN);
 			}
 		}
-		
+
 		Coordinate a1 = new Coordinate(7, 0);
 		Coordinate a8 = new Coordinate(0, 0);
 		Coordinate h1 = new Coordinate(7, 7);
 		Coordinate h8 = new Coordinate(0, 7);
-		
+
 		// Check castling
 		if(movedPiece == WHITE_KING && colDifference == -2) {
 			// White castles queenside
@@ -494,7 +489,7 @@ public class Game {
 			this.setPieceAt(h8, null);
 			this.setPieceAt(0, 5, BLACK_ROOK);
 		}
-		
+
 		// update castling rights
 		if(movedPiece == WHITE_KING) {
 			this.setWhiteCanCastleKingside(false);
@@ -511,24 +506,24 @@ public class Game {
 		} else if(source.equals(h8) || source.equals(h8)) {
 			this.setBlackCanCastleKingside(false);
 		}
-		
+
 		// Update full-move clock
 		this.setFullMoveCounter(this.getFullMoveCounter() + (this.getTurn() == BLACK ? 1 : 0));
-		
+
 		// Update half-move clock
 		this.setHalfMoveCounter(capturedPiece != null || movedPiece == WHITE_PAWN || movedPiece == BLACK_PAWN ?
 				0 : this.getHalfMoveCounter() + 1);
-		
+
 		// Update whose turn it is
 		this.setTurn(this.getTurn().invert());
-		
+
 		// Update FEN lists / 3fold repetition counters
 		Map<String, Integer> fen3FoldMap = this.getPreviousFensFor3FoldRepetition();
 		String fen3Fold = this.getFenFor3FoldRepetition();
 		fen3FoldMap.put(fen3Fold, fen3FoldMap.containsKey(fen3Fold) ? fen3FoldMap.get(fen3Fold) + 1 : 1);
 		this.getPreviousFenStack().push(this.getFEN());
 	}
-	
+
 	/**
 	 * This move undoes the most recent move played on the board.
 	 * It does this by checking the previous FEN and loading the position
@@ -545,13 +540,13 @@ public class Game {
 		} else {
 			fen3FoldMap.put(fen3Fold, repetitions - 1);
 		}
-		
+
 		// Update the previous fen lists
 		Stack<String> fenStack = this.getPreviousFenStack();
 		fenStack.pop();
 		this.loadFromFEN(fenStack.peek());
 	}
-	
+
 	/**
 	 * This method returns the relevant parts of the FEN that
 	 * are to be used when checking for threefold repetition.
@@ -565,7 +560,7 @@ public class Game {
 		String[] fenParts = this.getFEN().split(" ");
 		return fenParts[0] + ' ' + fenParts[1] + ' ' + fenParts[2] + ' ' + fenParts[3];
 	}
-	
+
 	/**
 	 * This method changes the piece at a given coordinate.
 	 * TODO make this private?
@@ -577,7 +572,7 @@ public class Game {
 	public void setPieceAt(Coordinate coordinate, Piece piece) {
 		this.setPieceAt(coordinate.getRow(), coordinate.getCol(), piece);
 	}
-	
+
 	/**
 	 * This method changes the piece at a given row and col.
 	 * Note that (0, 0) is the top-left corner.
@@ -592,7 +587,7 @@ public class Game {
 	public void setPieceAt(int r, int c, Piece piece) {
 		this.getBoard()[r][c] = piece;
 	}
-	
+
 	/**
 	 * Gets the piece at a specific coordinate.
 	 * @param coordinate The coordinate to get the piece from.
@@ -616,7 +611,7 @@ public class Game {
 	public Piece getPieceAt(int row, int col) {
 		return this.getBoard()[row][col];
 	}
-	
+
 	/**
 	 * Gets a count of all the pieces on the chess board.
 	 * @return A HashMap of the count of each chess piece.
@@ -637,7 +632,7 @@ public class Game {
 		}
 		return pieceCount;
 	}
-	
+
 	/**
 	 * For a checkmate to occur, the king must be in check, and
 	 * there must be no legal moves for the side to move.
@@ -691,7 +686,7 @@ public class Game {
 				this.is50MoveRule() ||
 				this.is3FoldRepetition();
 	}
-	
+
 	/**
 	 * Returns whether the game is a stalemate.
 	 * A stalemate occurs when there are no legal moves
@@ -703,7 +698,7 @@ public class Game {
 		return this.getLegalMoves().size() == 0 &&
 				!this.isInCheck(this.getTurn());
 	}
-	
+
 	/**
 	 * Returns true if the game is a draw by the 50-move rule:
 	 * A game is declared a draw if the game has continued for
@@ -722,7 +717,7 @@ public class Game {
 	public boolean is50MoveRule() {
 		return this.getHalfMoveCounter() >= 100; 
 	}
-	
+
 	/**
 	 * Returns whether or not the game is a draw by threefold repetition.
 	 * The threefold repetition only applies if it is the same position;
@@ -741,7 +736,7 @@ public class Game {
 	public boolean is3FoldRepetition(){
 		return this.getPreviousFensFor3FoldRepetition().get(this.getFenFor3FoldRepetition()) >= 3;
 	}
-	
+
 	/**
 	 * A game is declared a draw by insufficient material if there
 	 * is no way to construct a checkmate by a sequence of legal
@@ -756,23 +751,23 @@ public class Game {
 	 * false otherwise.
 	 */
 	public boolean isInsufficientMaterial(){
-		 Map<Piece, Integer> pieceCounts = this.getPieceCount();
-		 Piece[] maxZero = {WHITE_PAWN, WHITE_ROOK, WHITE_QUEEN, BLACK_PAWN, BLACK_ROOK, BLACK_QUEEN};
-		 Piece[] maxOne = {WHITE_KNIGHT, WHITE_BISHOP, BLACK_KNIGHT, BLACK_BISHOP};
-		 
-		 for(Piece piece : maxZero) {
-			 if(pieceCounts.get(piece) != 0) {
-				 return false;
-			 }
-		 }
-		 
-		 int total = 0;
-		 for(Piece piece : maxOne) {
-			 total += pieceCounts.get(piece);
-		 }
-		 return total <= 1;
+		Map<Piece, Integer> pieceCounts = this.getPieceCount();
+		Piece[] maxZero = {WHITE_PAWN, WHITE_ROOK, WHITE_QUEEN, BLACK_PAWN, BLACK_ROOK, BLACK_QUEEN};
+		Piece[] maxOne = {WHITE_KNIGHT, WHITE_BISHOP, BLACK_KNIGHT, BLACK_BISHOP};
+
+		for(Piece piece : maxZero) {
+			if(pieceCounts.get(piece) != 0) {
+				return false;
+			}
+		}
+
+		int total = 0;
+		for(Piece piece : maxOne) {
+			total += pieceCounts.get(piece);
+		}
+		return total <= 1;
 	}
-	
+
 	/**
 	 * Sets Game's object attributes based on the String describing
 	 * the Forsyth-Edwards Notation of the position.
@@ -810,7 +805,7 @@ public class Game {
 		this.setWhiteCanCastleQueenside(parts[2].contains("Q"));
 		this.setBlackCanCastleKingside(parts[2].contains("k"));
 		this.setBlackCanCastleQueenside(parts[2].contains("q"));
-		
+
 		// Get en passant target square
 		if(parts[3].equals("-")) {
 			this.setEnPassantTargetSquare(null);
@@ -917,21 +912,21 @@ public class Game {
 
 		// Add the other fields to the FEN
 		fen += " " + 
-			   (this.getTurn() == WHITE ? 'w' : 'b') + 
-			   ' ' +
-			   castlingRights +
-			   ' ' +
-			   (this.getEnPassantTargetSquare() == null ? '-'
-					   : this.getEnPassantTargetSquare().getAlgebraicNotation()) +
-			   ' ' +
-			   this.getHalfMoveCounter() +
-			   ' ' +
-			   this.getFullMoveCounter();
-		
+				(this.getTurn() == WHITE ? 'w' : 'b') + 
+				' ' +
+				castlingRights +
+				' ' +
+				(this.getEnPassantTargetSquare() == null ? '-'
+						: this.getEnPassantTargetSquare().getAlgebraicNotation()) +
+				' ' +
+				this.getHalfMoveCounter() +
+				' ' +
+				this.getFullMoveCounter();
+
 		return fen;
 	}
 
-	
+
 	/**
 	 * Returns a String representation of the game, which is
 	 * an ASCII representation of the board, followed by
@@ -951,7 +946,7 @@ public class Game {
 		s += this.getFEN();
 		return s;
 	}
-	
+
 	/**
 	 * Gets the matrix of pieces representing the board.
 	 * @return The matrix of pieces representing the board.
@@ -959,7 +954,7 @@ public class Game {
 	public Piece[][] getBoard() {
 		return board;
 	}
-	
+
 	/**
 	 * Sets the matrix of pieces representing the board.
 	 * @param board The matrix of pieces representing the board.
@@ -975,7 +970,7 @@ public class Game {
 	public Color getTurn() {
 		return this.turn;
 	}
-	
+
 	/**
 	 * Sets the color of the current side to move.
 	 * @param turn The color of the current side to move to set.
@@ -983,7 +978,7 @@ public class Game {
 	public void setTurn(Color turn) {
 		this.turn = turn;
 	}
-	
+
 	/**
 	 * Returns whether White has kingside castling rights.
 	 * @return true if White has kingside castling rights.
@@ -993,7 +988,7 @@ public class Game {
 	public boolean whiteCanCastleKingside() {
 		return whiteCanCastleKingside;
 	}
-	
+
 	/**
 	 * Sets the kingside castling rights for White.
 	 * @param whiteCanCastleKingside The kingside castling
@@ -1003,7 +998,7 @@ public class Game {
 	public void setWhiteCanCastleKingside(boolean whiteCanCastleKingside) {
 		this.whiteCanCastleKingside = whiteCanCastleKingside;
 	}
-	
+
 	/**
 	 * Returns whether White has queenside castling rights.
 	 * @return true if White has queenside castling rights.
@@ -1013,7 +1008,7 @@ public class Game {
 	public boolean whiteCanCastleQueenside() {
 		return whiteCanCastleQueenside;
 	}
-	
+
 	/**
 	 * Sets the queenside castling rights for White.
 	 * @param whiteCanCastleQueenside The queenside castling
@@ -1023,7 +1018,7 @@ public class Game {
 	public void setWhiteCanCastleQueenside(boolean whiteCanCastleQueenside) {
 		this.whiteCanCastleQueenside = whiteCanCastleQueenside;
 	}
-	
+
 	/**
 	 * Returns whether Black has kingside castling rights.
 	 * @return true if Black has kingside castling rights.
@@ -1033,7 +1028,7 @@ public class Game {
 	public boolean blackCanCastleKingside() {
 		return blackCanCastleKingside;
 	}
-	
+
 	/**
 	 * Sets the kingside castling rights for Black.
 	 * @param blackCanCastleKingside The kingside castling
@@ -1043,7 +1038,7 @@ public class Game {
 	public void setBlackCanCastleKingside(boolean blackCanCastleKingside) {
 		this.blackCanCastleKingside = blackCanCastleKingside;
 	}
-	
+
 	/**
 	 * Returns whether Black has queenside castling rights.
 	 * @return true if Black has queenside castling rights.
@@ -1053,7 +1048,7 @@ public class Game {
 	public boolean blackCanCastleQueenside() {
 		return blackCanCastleQueenside;
 	}
-	
+
 	/**
 	 * Sets the queenside castling rights for Black.
 	 * @param blackCanCastleQueenside The queenside castling
@@ -1063,7 +1058,7 @@ public class Game {
 	public void setBlackCanCastleQueenside(boolean blackCanCastleQueenside) {
 		this.blackCanCastleQueenside = blackCanCastleQueenside;
 	}
-	
+
 	/**
 	 * This method is a generalization of the four methods
 	 * that return whether or not a side has castling rights
@@ -1099,7 +1094,7 @@ public class Game {
 		// TODO throw exception
 		return false;
 	}
-	
+
 	/**
 	 * This method is a generalization of the four methods that
 	 * set castling rights.
@@ -1128,7 +1123,7 @@ public class Game {
 			// TODO throw exception
 		}
 	}
-	
+
 	/**
 	 * Gets the half-move counter for the game.
 	 * 
@@ -1140,7 +1135,7 @@ public class Game {
 	public int getHalfMoveCounter() {
 		return halfMoveCounter;
 	}
-	
+
 	/**
 	 * Sets the half-move counter for the game.
 	 * 
@@ -1152,7 +1147,7 @@ public class Game {
 	public void setHalfMoveCounter(int halfMoveCounter) {
 		this.halfMoveCounter = halfMoveCounter;
 	}
-	
+
 	/**
 	 * Gets the full-move counter for the game.
 	 * 
@@ -1164,7 +1159,7 @@ public class Game {
 	public int getFullMoveCounter() {
 		return fullMoveCounter;
 	}
-	
+
 	/**
 	 * Sets the full-move counter for the game.
 	 * 
@@ -1176,7 +1171,7 @@ public class Game {
 	public void setFullMoveCounter(int fullMoveCounter) {
 		this.fullMoveCounter = fullMoveCounter;
 	}
-	
+
 	/**
 	 * Gets the Coordinate of the en passant target square.
 	 * Returns null if there is no en passant target square.
@@ -1186,7 +1181,7 @@ public class Game {
 	public Coordinate getEnPassantTargetSquare() {
 		return enPassantTargetSquare;
 	}
-	
+
 	/**
 	 * Sets the en passant target square.
 	 * @param enPassantTargetSquare The en passant target square
@@ -1195,7 +1190,7 @@ public class Game {
 	public void setEnPassantTargetSquare(Coordinate enPassantTargetSquare) {
 		this.enPassantTargetSquare = enPassantTargetSquare;
 	}
-	
+
 	/**
 	 * Gets the name of the player with the white pieces.
 	 * @return The name of the player with the white pieces.
@@ -1203,7 +1198,7 @@ public class Game {
 	public String getWhiteName() {
 		return whiteName;
 	}
-	
+
 	/**
 	 * Sets the name of the player with the white pieces.
 	 * @param whiteName The name of the player with the
@@ -1212,7 +1207,7 @@ public class Game {
 	public void setWhiteName(String whiteName) {
 		this.whiteName = whiteName;
 	}
-	
+
 	/**
 	 * Gets the name of the player with the black pieces.
 	 * @return The name of the player with the black pieces.
@@ -1220,7 +1215,7 @@ public class Game {
 	public String getBlackName() {
 		return blackName;
 	}
-	
+
 	/**
 	 * Sets the name of the player with the black pieces.
 	 * @param blackName The name of the player with the
@@ -1240,7 +1235,7 @@ public class Game {
 	public Stack<String> getPreviousFenStack() {
 		return previousFenStack;
 	}
-	
+
 	/**
 	 * Sets the stack of previous FENs which represent
 	 * the previous positions of the game.
@@ -1251,7 +1246,7 @@ public class Game {
 	public void setPreviousFenStack(Stack<String> previousFenStack) {
 		this.previousFenStack = previousFenStack;
 	}
-	
+
 	/**
 	 * Gets the map of partial FEN strings (which are relevant
 	 * to the threefold repetition rule) to the number of
@@ -1264,7 +1259,7 @@ public class Game {
 	public Map<String, Integer> getPreviousFensFor3FoldRepetition() {
 		return previousFensFor3FoldRepetition;
 	}
-	
+
 	/**
 	 * Sets the map of partial FEN strings (which are relevant
 	 * to the threefold repetition rule) to the number of

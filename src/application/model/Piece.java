@@ -22,7 +22,7 @@ import java.util.Map;
  * @date 11/04/2022
  */
 public enum Piece implements Movable {
-	
+
 	WHITE_KING (WHITE, 'K', KING_MOVE_GENERATOR,"Chess/src/Images/WhiteKing.png"),
 	WHITE_QUEEN (WHITE, 'Q', QUEEN_MOVE_GENERATOR,"Chess/src/Images/WhiteQueen.png"),
 	WHITE_ROOK (WHITE, 'R', ROOK_MOVE_GENERATOR,"Chess/src/Images/WhiteRook.png"),
@@ -35,7 +35,7 @@ public enum Piece implements Movable {
 	BLACK_BISHOP (BLACK, 'b', BISHOP_MOVE_GENERATOR,"Chess/src/Images/BlackBishop.png"),
 	BLACK_KNIGHT (BLACK, 'n', KNIGHT_MOVE_GENERATOR,"Chess/src/Images/BlackKnight.png"),
 	BLACK_PAWN (BLACK, 'p', PAWN_MOVE_GENERATOR,"Chess/src/Images/BlackPawn.png");
-	
+
 	public static final Piece[] ALL_PIECES = {WHITE_KING, WHITE_QUEEN, WHITE_ROOK, WHITE_BISHOP, WHITE_KNIGHT,
 			WHITE_PAWN, BLACK_KING, BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT, BLACK_PAWN};
 	public static final Map<Character, Piece> CHAR_TO_PIECE = new HashMap<>();
@@ -45,19 +45,19 @@ public enum Piece implements Movable {
 			Piece.CHAR_TO_PIECE.put(piece.getCharacter(), piece);
 		}
 	};
-	
+
 	private final Color color;
 	private final char character;
 	private final MoveGenerator moveGenerator;
 	private final String imageURL;
 
 	private Piece(Color color, char character, MoveGenerator moveGenerator,String imageURL) {
-	    this.color = color;
-	    this.character = character;
-	    this.moveGenerator = moveGenerator;
-	    this.imageURL = imageURL;
+		this.color = color;
+		this.character = character;
+		this.moveGenerator = moveGenerator;
+		this.imageURL = imageURL;
 	}
-	
+
 	/**
 	 * Returns whether this piece is the same color as the other.
 	 * @param other The other piece.
@@ -67,7 +67,7 @@ public enum Piece implements Movable {
 	public boolean isAlliedWith(Piece other) {
 		return this.getColor() == other.getColor();
 	}
-	
+
 	/**
 	 * Gets the generator function for this piece's moves.
 	 * @return The generator function for this piece's moves.
@@ -75,7 +75,7 @@ public enum Piece implements Movable {
 	public MoveGenerator getMoveGenerator() {
 		return this.moveGenerator;
 	}
-	
+
 	/**
 	 * Gets the Color of this piece.
 	 * @return The Color of this piece. 
@@ -83,7 +83,7 @@ public enum Piece implements Movable {
 	public Color getColor() {
 		return this.color;
 	}
-	
+
 	/**
 	 * Gets the char representation of this piece.
 	 * @return The char representation of this piece.
@@ -91,7 +91,7 @@ public enum Piece implements Movable {
 	public char getCharacter() {
 		return this.character;
 	}
-	
+
 	/**
 	 * Gets the images URL for the piece
 	 * @return the image URL for the piece
@@ -99,12 +99,12 @@ public enum Piece implements Movable {
 	public String getImageURL() {
 		return this.imageURL;
 	}
-	
+
 	@Override
 	public List<Move> getPseudoLegalMoves(Game game, Coordinate coordinate) {
 		return this.getMoveGenerator().apply(game, coordinate);
 	}
-	
+
 	@Override
 	public List<Move> getLegalMoves(Game game, Coordinate coordinate) {
 		List<Move> moves = this.getPseudoLegalMoves(game, coordinate);

@@ -11,7 +11,7 @@ import java.util.List;
  * @date 11/04/2022
  */
 public interface Movable {
-	
+
 	/**
 	 * Gets a List of Moves that the piece may possibly make.
 	 * These moves may not be legal to play; for example, a piece may
@@ -22,7 +22,7 @@ public interface Movable {
 	 * @return A List of Moves; some (or all) of which may not be legal (playable).
 	 */
 	public List<Move> getPseudoLegalMoves(Game game, Coordinate coordinate);
-	
+
 	/**
 	 * Gets a List of Moves that the piece is definitely allowed to make.
 	 * If the length of this list is 0, then the game has ended by
@@ -33,5 +33,5 @@ public interface Movable {
 	 * @return A List of Moves; all of which are legal (playable).
 	 */
 	public List<Move> getLegalMoves(Game game, Coordinate coordinate);
-	
+
 }
