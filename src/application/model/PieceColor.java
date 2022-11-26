@@ -1,11 +1,11 @@
 package application.model;
 
 /**
- * The Color enum refers to both the colors of the pieces and
+ * The PieceColor enum refers to both the colors of the pieces and
  * the player who is controlling said pieces.
  * @author Blake Herrera xng021
  */
-public enum Color {
+public enum PieceColor {
 
 	WHITE, BLACK;
 
@@ -15,7 +15,7 @@ public enum Color {
 	 * @return BLACK, if the color was WHITE.
 	 * WHITE, if the color was BLACK.
 	 */
-	public Color invert() {
+	public PieceColor invert() {
 		return this == WHITE ? BLACK : WHITE;
 	}
 }
