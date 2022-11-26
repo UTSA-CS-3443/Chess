@@ -297,7 +297,7 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 		 */
 		public boolean highLightSquare(int r, int c) {
 			MyButton button = ChessBoardController.buttons[r][c];
-			button.setStyle("-fx-background-color: lemonchiffon;");
+			button.setStyle("-fx-background-color: " + ((r + c) % 2 == 0 ? "lemonchiffon;" : "khaki;"));
 			return button.isHighlighted = true;
 		}
 
