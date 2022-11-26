@@ -1,6 +1,6 @@
 package application.model;
 
-import static application.model.Color.*;
+import static application.model.PieceColor.*;
 import static application.model.MoveGenerator.*;
 
 import java.util.HashMap;
@@ -46,12 +46,12 @@ public enum Piece implements Movable {
 		}
 	};
 
-	private final Color color;
+	private final PieceColor color;
 	private final char character;
 	private final MoveGenerator moveGenerator;
 	private final String imageURL;
 
-	private Piece(Color color, char character, MoveGenerator moveGenerator,String imageURL) {
+	private Piece(PieceColor color, char character, MoveGenerator moveGenerator,String imageURL) {
 		this.color = color;
 		this.character = character;
 		this.moveGenerator = moveGenerator;
@@ -77,10 +77,10 @@ public enum Piece implements Movable {
 	}
 
 	/**
-	 * Gets the Color of this piece.
-	 * @return The Color of this piece. 
+	 * Gets the PieceColor of this piece.
+	 * @return The PieceColor of this piece. 
 	 */
-	public Color getColor() {
+	public PieceColor getColor() {
 		return this.color;
 	}
 
