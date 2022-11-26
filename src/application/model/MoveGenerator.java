@@ -1,6 +1,6 @@
 package application.model;
 
-import static application.model.Color.WHITE;
+import static application.model.PieceColor.WHITE;
 
 import java.util.ArrayList;
 import java.util.List;
