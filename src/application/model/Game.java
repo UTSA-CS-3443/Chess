@@ -2,7 +2,7 @@ package application.model;
 
 import static application.model.Piece.*;
 import static application.model.Side.*;
-import static application.model.Color.*;
+import static application.model.PieceColor.*;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -32,7 +32,7 @@ public class Game {
 			"rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 	private Piece[][] board;
-	private Color turn;
+	private PieceColor turn;
 	private boolean whiteCanCastleKingside,
 					whiteCanCastleQueenside,
 					blackCanCastleKingside,
@@ -46,20 +46,20 @@ public class Game {
 	private String whiteName,
 				   blackName;
 	
-	public Game() {
+	public Game() throws IllegalPositionException, PositionIsCheckmateException, PositionIsDrawException {
 		this(Game.STARTING_FEN);
 	}
 
-	public Game(String fen) {
+	public Game(String fen) throws IllegalPositionException, PositionIsCheckmateException, PositionIsDrawException {
 		this(fen, "White", "Black");
 	}
 
-	public Game(String whiteName, String blackName) {
+	public Game(String whiteName, String blackName) throws IllegalPositionException, PositionIsCheckmateException, PositionIsDrawException {
 		this(Game.STARTING_FEN, whiteName, blackName);
 	}
 
 	// TODO check if illegal starting position
-	public Game(String fen, String whiteName, String blackName) {
+	public Game(String fen, String whiteName, String blackName) throws IllegalPositionException, PositionIsCheckmateException, PositionIsDrawException {
 		this.loadFromFEN(fen);
 		this.whiteName = whiteName;
 		this.blackName = blackName;
@@ -67,6 +67,9 @@ public class Game {
 		this.previousFenStack.push(fen);
 		this.previousFensFor3FoldRepetition = new HashMap<>();
 		this.previousFensFor3FoldRepetition.put(this.getFenFor3FoldRepetition(), 1);
+		
+		// throws exceptions if !true
+		this.isLegalPosition();
 	}
 
 	/**
@@ -102,12 +105,18 @@ public class Game {
 	 */
 	public boolean isLegalPosition() {
 		// Set up counts for pieces
-		Map<Piece, Integer> pieceCounts = this.getPieceCount();
+//		Map<Piece, Integer> pieceCounts = this.getPieceCount();
 		
 		// There should be exactly 1 white and black king
-		if(pieceCounts.get(WHITE_KING) != 1 ||
-				pieceCounts.get(BLACK_KING) != 1) {
-			return false;
+//		if(	pieceCounts.get(WHITE_KING) != 1
+//				|| pieceCounts.get(BLACK_KING) != 1) {
+//			return false;
+		if(this.isInsufficientMaterial()) {
+			throw new PositionIsInsufficientMaterial();
+		} else if(this.isDraw()) { // check if game isDraw or isCheckmate
+			throw new PositionIsDrawException();
+		} else if(this.isCheckmate()) {
+			throw new PositionIsCheckmateException();
 		}
 
 		// TODO no pawns on 1st or last row?
@@ -151,7 +160,7 @@ public class Game {
 	 * @return The list of pseudo-legal moves for the player
 	 * in the current position.
 	 */
-	public List<Move> getPseudoLegalMoves(Color color) {
+	public List<Move> getPseudoLegalMoves(PieceColor color) {
 		List<Move> moves = new LinkedList<>();
 		for(int r=0; r<Game.BOARD_ROWS; r++) {
 			for(int c=0; c<Game.BOARD_COLS; c++) {
@@ -233,7 +242,7 @@ public class Game {
 					private int r = 0;
 					private int c = 0;
 
-					{
+					{ 
 						while(r < Game.BOARD_ROWS &&
 								Game.this.getPieceAt(r, c) == null) {
 							if(++c >= Game.BOARD_COLS) {
@@ -271,7 +280,7 @@ public class Game {
 	 * @param color The color king to check.
 	 * @return true if the king is in check, false otherwise.
 	 */
-	public boolean isInCheck(Color color) {
+	public boolean isInCheck(PieceColor color) {
 		Coordinate kingLocation = this.getKingLocation(color);
 		for(Move move : this.getPseudoLegalMoves(color.invert())) {
 			if(move.getToCoordinate().equals(kingLocation)) {
@@ -287,7 +296,7 @@ public class Game {
 	 * @param color The color king to find.
 	 * @return The Coordinate where the king sits.
 	 */
-	public Coordinate getKingLocation(Color color) {
+	public Coordinate getKingLocation(PieceColor color) {
 		for(Coordinate coordinate : Game.coordinateIterator()) {
 			if(this.getPieceAt(coordinate) == (color == WHITE ? WHITE_KING : BLACK_KING)) {
 				return coordinate;
@@ -609,7 +618,11 @@ public class Game {
 	 * null if there is no piece.
 	 */
 	public Piece getPieceAt(int row, int col) {
-		return this.getBoard()[row][col];
+		try {
+			return this.getBoard()[row][col];
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return null;
+		}
 	}
 
 	/**
@@ -641,16 +654,19 @@ public class Game {
 	 * @see Game.isDraw()
 	 */
 	public boolean isCheckmate() {
+		// TODO: isCheckmate for inverse turn not working
 		return this.getLegalMoves().size() == 0 &&
-				this.isInCheck(this.getTurn());
+				this.isInCheck(this.getTurn())
+				|| 
+				this.getPseudoLegalMoves(this.getTurn().invert()).size() == 0
+				&& this.isInCheck(this.getTurn().invert());
 	}
 
 	/**
-	 *
-	 * 
+	 * Changes turn
 	 */
 	public void changeTurn() {
-
+		this.setTurn(this.turn.invert());
 	}
 
 	/**
@@ -678,7 +694,7 @@ public class Game {
 	 * 
 	 * 6. One side runs out of time, but the other side has
 	 * only a king left. (There are no clocks in this app.)
-	 * @return
+	 * @return true if game is a draw, otherwise, false.
 	 */
 	public boolean isDraw() {
 		return this.isStalemate() ||
@@ -754,7 +770,11 @@ public class Game {
 		Map<Piece, Integer> pieceCounts = this.getPieceCount();
 		Piece[] maxZero = {WHITE_PAWN, WHITE_ROOK, WHITE_QUEEN, BLACK_PAWN, BLACK_ROOK, BLACK_QUEEN};
 		Piece[] maxOne = {WHITE_KNIGHT, WHITE_BISHOP, BLACK_KNIGHT, BLACK_BISHOP};
-
+		
+		if(pieceCounts.get(WHITE_KING) == 0 || pieceCounts.get(BLACK_KING) == 0) {
+			return true;
+		}
+		
 		for(Piece piece : maxZero) {
 			if(pieceCounts.get(piece) != 0) {
 				return false;
@@ -765,6 +785,7 @@ public class Game {
 		for(Piece piece : maxOne) {
 			total += pieceCounts.get(piece);
 		}
+		
 		return total <= 1;
 	}
 
@@ -781,20 +802,25 @@ public class Game {
 	public void loadFromFEN(String fen) {
 		// Split the FEN into parts
 		String[] parts = fen.split(" ");
-
+		
 		// Set pieces from part 1 of FEN
 		String[] pieces = parts[0].split("/");
 		Piece[][] board = new Piece[8][8];
-		for(int r=0; r<board.length; r++) {
-			for(int c=0, i=0; c<board[r].length; c++, i++) {
-				char ch = pieces[r].charAt(i);
-				if('0' < ch && ch < '9') {
-					c += ch - '0' - 1;
-				} else {
-					board[r][c] = Piece.CHAR_TO_PIECE.get(ch);
+		try {
+			for(int r=0; r<board.length; r++) {
+				for(int c=0, i=0; c<board[r].length; c++, i++) {
+					char ch = pieces[r].charAt(i);
+					if('0' < ch && ch < '9') {
+						c += ch - '0' - 1;
+					} else {
+						board[r][c] = Piece.CHAR_TO_PIECE.get(ch);
+					}
 				}
 			}
+		} catch(ArrayIndexOutOfBoundsException e) {
+			return;
 		}
+		
 		this.setBoard(board);
 
 		// Get the current turn
@@ -967,7 +993,7 @@ public class Game {
 	 * Gets the color of the current side to move.
 	 * @return The color of the current side to move.
 	 */
-	public Color getTurn() {
+	public PieceColor getTurn() {
 		return this.turn;
 	}
 
@@ -975,7 +1001,7 @@ public class Game {
 	 * Sets the color of the current side to move.
 	 * @param turn The color of the current side to move to set.
 	 */
-	public void setTurn(Color turn) {
+	public void setTurn(PieceColor turn) {
 		this.turn = turn;
 	}
 
@@ -983,7 +1009,7 @@ public class Game {
 	 * Returns whether White has kingside castling rights.
 	 * @return true if White has kingside castling rights.
 	 * false otherwise.
-	 * @see Game.hasCastlingRights(Color color, Side side)
+	 * @see Game.hasCastlingRights(PieceColor color, Side side)
 	 */
 	public boolean whiteCanCastleKingside() {
 		return whiteCanCastleKingside;
@@ -993,7 +1019,7 @@ public class Game {
 	 * Sets the kingside castling rights for White.
 	 * @param whiteCanCastleKingside The kingside castling
 	 * rights to set for White.
-	 * @see Game.setCastlingRights(Color color, Side side, boolean canCastle)
+	 * @see Game.setCastlingRights(PieceColor color, Side side, boolean canCastle)
 	 */
 	public void setWhiteCanCastleKingside(boolean whiteCanCastleKingside) {
 		this.whiteCanCastleKingside = whiteCanCastleKingside;
@@ -1003,7 +1029,7 @@ public class Game {
 	 * Returns whether White has queenside castling rights.
 	 * @return true if White has queenside castling rights.
 	 * false otherwise.
-	 * @see Game.hasCastlingRights(Color color, Side side)
+	 * @see Game.hasCastlingRights(PieceColor color, Side side)
 	 */
 	public boolean whiteCanCastleQueenside() {
 		return whiteCanCastleQueenside;
@@ -1013,7 +1039,7 @@ public class Game {
 	 * Sets the queenside castling rights for White.
 	 * @param whiteCanCastleQueenside The queenside castling
 	 * rights to set for White.
-	 * @see Game.setCastlingRights(Color color, Side side, boolean canCastle)
+	 * @see Game.setCastlingRights(PieceColor color, Side side, boolean canCastle)
 	 */
 	public void setWhiteCanCastleQueenside(boolean whiteCanCastleQueenside) {
 		this.whiteCanCastleQueenside = whiteCanCastleQueenside;
@@ -1023,7 +1049,7 @@ public class Game {
 	 * Returns whether Black has kingside castling rights.
 	 * @return true if Black has kingside castling rights.
 	 * false otherwise.
-	 * @see Game.hasCastlingRights(Color color, Side side)
+	 * @see Game.hasCastlingRights(PieceColor color, Side side)
 	 */
 	public boolean blackCanCastleKingside() {
 		return blackCanCastleKingside;
@@ -1033,7 +1059,7 @@ public class Game {
 	 * Sets the kingside castling rights for Black.
 	 * @param blackCanCastleKingside The kingside castling
 	 * rights to set for Black.
-	 * @see Game.setCastlingRights(Color color, Side side, boolean canCastle)
+	 * @see Game.setCastlingRights(PieceColor color, Side side, boolean canCastle)
 	 */
 	public void setBlackCanCastleKingside(boolean blackCanCastleKingside) {
 		this.blackCanCastleKingside = blackCanCastleKingside;
@@ -1043,7 +1069,7 @@ public class Game {
 	 * Returns whether Black has queenside castling rights.
 	 * @return true if Black has queenside castling rights.
 	 * false otherwise.
-	 * @see Game.hasCastlingRights(Color color, Side side)
+	 * @see Game.hasCastlingRights(PieceColor color, Side side)
 	 */
 	public boolean blackCanCastleQueenside() {
 		return blackCanCastleQueenside;
@@ -1053,7 +1079,7 @@ public class Game {
 	 * Sets the queenside castling rights for Black.
 	 * @param blackCanCastleQueenside The queenside castling
 	 * rights to set for Black.
-	 * @see Game.setCastlingRights(Color color, Side side, boolean canCastle)
+	 * @see Game.setCastlingRights(PieceColor color, Side side, boolean canCastle)
 	 */
 	public void setBlackCanCastleQueenside(boolean blackCanCastleQueenside) {
 		this.blackCanCastleQueenside = blackCanCastleQueenside;
@@ -1077,7 +1103,7 @@ public class Game {
 	 * @return true if the king of the given color has
 	 * castling rights for the given side.
 	 */
-	public boolean hasCastlingRights(Color color, Side side) {
+	public boolean hasCastlingRights(PieceColor color, Side side) {
 		if(color == WHITE) {
 			if(side == KINGSIDE) {
 				return this.whiteCanCastleKingside();
@@ -1110,7 +1136,7 @@ public class Game {
 	 * @param canCastle Whether or not the given color has
 	 * the right to castle on the given side.
 	 */
-	public void setCastlingRights(Color color, Side side, boolean canCastle) {
+	public void setCastlingRights(PieceColor color, Side side, boolean canCastle) {
 		if(color == WHITE && side == KINGSIDE) {
 			this.setWhiteCanCastleKingside(canCastle);
 		} else if(color == WHITE && side == QUEENSIDE) {
