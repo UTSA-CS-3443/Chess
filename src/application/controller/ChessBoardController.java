@@ -280,8 +280,9 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 			//System.out.println("highlight is reset");
 			for(int r = 0; r< 8; r++) {
 				for(int c = 0; c < 8; c++) {
-					ChessBoardController.buttons[r][c].setEffect(null);
-					ChessBoardController.buttons[r][c].isHighlighted = false;
+					MyButton button = ChessBoardController.buttons[r][c];
+					button.setStyle("-fx-background-color: " + ((r + c) % 2 == 0 ? "white;" : "grey"));
+					button.isHighlighted = false;
 				}
 			}
 			
@@ -295,10 +296,9 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 		 * @return boolean  the isHighlighted boolean value now set to true
 		 */
 		public boolean highLightSquare(int r, int c) {
-			Shadow shadow = new Shadow();
-			shadow.setColor(Color.YELLOW);
-			ChessBoardController.buttons[r][c].setEffect(shadow);
-			return ChessBoardController.buttons[r][c].isHighlighted = true;
+			MyButton button = ChessBoardController.buttons[r][c];
+			button.setStyle("-fx-background-color: lemonchiffon;");
+			return button.isHighlighted = true;
 		}
 
 		@Override
