@@ -14,8 +14,6 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.effect.Effect;
-import javafx.scene.effect.Shadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import application.Main;
@@ -215,23 +213,21 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 				}
 
 				if(game.isCheckmate()) {
-					Label label = new Label("CheckMate");
+					Label label = new Label("Checkmate");
 					label.setPrefWidth(400);
 					label.setPrefHeight(200);
 					label.setAlignment(Pos.BOTTOM_CENTER);
 					label.setFont(new Font(50));
-					label.setStyle("-fx-text-fill: black");
+					label.setStyle("-fx-text-fill: red");
 					ChessBoardController.popup.getContent().add(label);
 					ChessBoardController.popup.show(Main.stage);
-				}
-
-				else if(game.isDraw()) {
+				} else if(game.isDraw()) {
 					Label label = new Label("Draw");
 					label.setPrefWidth(400);
 					label.setPrefHeight(200);
 					label.setAlignment(Pos.BOTTOM_CENTER);
 					label.setFont(new Font(50));
-					label.setStyle("-fx-text-fill: black");
+					label.setStyle("-fx-text-fill: red");
 					ChessBoardController.popup.getContent().add(label);
 					ChessBoardController.popup.show(Main.stage);
 				}
@@ -243,13 +239,18 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 				if(this.hasPiece) {
 					Piece piece = game.getPieceAt(row, col);
 					Coordinate cord = new Coordinate(row,col);
-					List<Move> legalMoves = piece.getLegalMoves(game, cord);
-					for(Move move: legalMoves){
-						int r = move.getToRow();
-						int c = move.getToCol();
+					try {
+						List<Move> legalMoves = piece.getLegalMoves(game, cord);
+						for(Move move: legalMoves){
+							int r = move.getToRow();
+							int c = move.getToCol();
 
-						highLightSquare(r,c);
+							highLightSquare(r,c);
+						}
+					} catch (NullPointerException npe) {
+						
 					}
+					
 				}
 				lastSquareClicked = this;
 			}
