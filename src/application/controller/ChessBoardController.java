@@ -114,6 +114,7 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 			
 			return;
 		}
+		popup.getContent().clear();
 		popup.hide();
 		try {
 			FXMLLoader loader = new FXMLLoader();
