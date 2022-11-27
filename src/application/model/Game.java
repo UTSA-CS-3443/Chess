@@ -382,24 +382,30 @@ public class Game {
 			if(this.isInCheck(movedPiece.getColor())) {
 				return false;
 			}
-			//squares f1/f8/c1/c8 must be clear and not attacked
-			Coordinate castlingTargetSquare = kingLocation.offset(0, colDifference / 2);
-			//squares g1/g8/c1/c8 must be clear
-			Coordinate castlingTargetSquare2 = kingLocation.offset(0, colDifference);
-			//squares b1/b8 must be clear
-			Coordinate castlingTargetSquare3 = colDifference != -2 ? null : kingLocation.offset(0, 3);
-			if(this.getPieceAt(castlingTargetSquare) != null ||
-					this.getPieceAt(castlingTargetSquare2) != null ||
-					castlingTargetSquare3 != null && this.getPieceAt(castlingTargetSquare3) != null) {
+			/* Squares f1/f8/c1/c8 must be clear and not attacked.
+			 * Squares g1/g8/c1/c8 must be clear.
+			 * (If these squares are under attack, that is checked later.)
+			 * Squares b1/b8 must be clear.
+			 */
+			Coordinate kingPassThroughSquare = kingLocation.offset(0, colDifference / 2);
+			Coordinate queenRookPassThroughSquare = colDifference != -2 ? null : kingLocation.offset(0, 3);
+			if(this.getPieceAt(kingPassThroughSquare) != null ||
+					this.getPieceAt(move.getToCoordinate()) != null ||
+					queenRookPassThroughSquare != null && this.getPieceAt(queenRookPassThroughSquare) != null) {
 				return false;
 			}
 			// You cannot castle "through" check
-			for(Move opponentMove : this.getPseudoLegalMoves(movedPiece.getColor().invert())) {
-				if(opponentMove.getToCoordinate().equals(castlingTargetSquare)) {
-					return false;
-				}
+			// Put the king on this square and see if he is in check.
+			this.setPieceAt(kingPassThroughSquare, movedPiece);
+			this.setPieceAt(move.getFromCoordinate(), null);
+			if(this.isInCheck(movedPiece.getColor())) {
+				this.setPieceAt(kingPassThroughSquare, null);
+				this.setPieceAt(move.getFromCoordinate(), movedPiece);
+				return false;
 			}
-			// Castling "into" check is covered later
+			this.setPieceAt(kingPassThroughSquare, null);
+			this.setPieceAt(move.getFromCoordinate(), movedPiece);
+			
 		}
 		// Check castling rights / legality
 		if(movedPiece == WHITE_KING) {
