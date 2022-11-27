@@ -443,6 +443,7 @@ public class Game {
 		Piece capturedPiece = this.getPieceAt(destination);
 		this.setPieceAt(source, null);
 		this.setPieceAt(destination, movedPiece);
+		this.setEnPassantTargetSquare(null);
 
 		int rowDifference = move.getRowDifference();
 		int colDifference = move.getColDifference();
@@ -459,8 +460,6 @@ public class Game {
 			// Check if pawn moved 2 squares for en passant
 			if(Math.abs(rowDifference) == 2) {
 				this.setEnPassantTargetSquare(source.offset(rowDifference / 2, 0));
-			} else {
-				this.setEnPassantTargetSquare(null);
 			}
 
 			/*
