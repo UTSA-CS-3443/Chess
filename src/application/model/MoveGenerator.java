@@ -47,12 +47,25 @@ implements BiFunction<Game, Coordinate, List<Move>> {
 			int direction = game.getPieceAt(coordinate).getColor() == WHITE ? -1 : 1;
 
 			// Add pawn jumps 1 or 2 spaces to list of moves
-			moves.add(new Move(coordinate, coordinate.offset(direction, 0)));
-			moves.add(new Move(coordinate, coordinate.offset(direction * 2, 0)));
+			Move move = new Move(coordinate, coordinate.offset(direction, 0));
+			if(move.isInBounds() && game.getPieceAt(move.getToCoordinate()) == null) {
+				moves.add(move);
+			}
+			move = new Move(coordinate, coordinate.offset(direction * 2,  0));
+			if(move.isInBounds() && game.getPieceAt(move.getToCoordinate()) == null) {
+				moves.add(move);
+			}
 
 			// Add pawn captures to list of moves
-			moves.add(new Move(coordinate, coordinate.offset(direction, 1)));
-			moves.add(new Move(coordinate, coordinate.offset(direction, -1)));
+			move = new Move(coordinate, coordinate.offset(direction, 1));
+			if(move.isInBounds() && game.getPieceAt(move.getToCoordinate()) != null) {
+				moves.add(move);
+			}
+			move = new Move(coordinate, coordinate.offset(direction, -1));
+			if(move.isInBounds() && game.getPieceAt(move.getToCoordinate()) != null) {
+				moves.add(move);
+			}
+			
 			return moves;
 		}
 	};

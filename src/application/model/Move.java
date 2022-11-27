@@ -25,6 +25,16 @@ public class Move {
 		this.fromCoordinate = fromCoordinate;
 		this.toCoordinate = toCoordinate;
 	}
+	
+	/**
+	 * Returns true if both the source and destination coordinate
+	 * are in bounds.
+	 * @return true if both the source and destination coordinate
+	 * are in bounds. false otherwise.
+	 */
+	public boolean isInBounds() {
+		return this.getFromCoordinate().isInBounds() && this.getToCoordinate().isInBounds();
+	}
 
 	/**
 	 * Compares two moves and returns true if the coordinates are equal.
