@@ -8,3 +8,5 @@ A simple, lightweight, and easy-to-use chess desktop application. Allows support
 - Fifty-Move Rule
 - Threefold Repetition Draw
 - Stalemate Draw
+# UML
+UML is located within the GITHUB File system
