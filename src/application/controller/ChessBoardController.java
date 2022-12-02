@@ -201,21 +201,16 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 					player2Label.setTextFill(Color.BLACK);
 				}
 
-//				this.hasPiece = false;
 				game.pushMove(move);
 				System.out.println();
 				System.out.println(game);
 				lastSquareClicked = null;
 				
-				
-				//update graphics
-//				lastSquareClicked.hasPiece(false);
-				
+				// definitely a more efficient way to do this
+				// update graphics
 				for(int r = 0; r < 8; r++) {
 					for(int c = 0; c < 8; c++) {
 						ChessBoardController.buttons[r][c].updateImage();
-//						if(ChessBoardController.buttons[r][c].getGraphic() != null) {
-//						}
 					}
 				}
 
@@ -243,23 +238,18 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 				resetHighLightedSquares();
 				System.out.println();
 				System.out.println(this);
-				
-				// TODO: bug - hasPiece is not set to false upon a piece moving out of a square
+
 				if(this.hasPiece) {
 					Piece piece = game.getPieceAt(row, col);
 					Coordinate cord = new Coordinate(row,col);
-//					try {
-						List<Move> legalMoves = piece.getLegalMoves(game, cord);
-						for(Move move: legalMoves){
-							int r = move.getToRow();
-							int c = move.getToCol();
+					List<Move> legalMoves = piece.getLegalMoves(game, cord);
+					for(Move move: legalMoves){
+						int r = move.getToRow();
+						int c = move.getToCol();
 
-							highLightSquare(r,c);
-						}
-//					} catch (NullPointerException npe) {
-//						
-//					}
-					
+						highLightSquare(r,c);
+					}
+
 				}
 				lastSquareClicked = this;
 			}
