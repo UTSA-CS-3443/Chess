@@ -9,9 +9,6 @@ A simple, lightweight, and easy-to-use chess desktop application. Allows support
 - Threefold Repetition Draw
 - Stalemate Draw
 
-## UML
-UML is located within the GITHUB File system
-
 ## Documentation
 #### Controllers
 ChessBoardController: Controls ChessBoard.fxml view
