@@ -156,7 +156,10 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 				ImageView imageView = getImageFromPiece(piece);
 				this.setGraphic(imageView);
 			}
-			else this.setGraphic(null);
+			else {
+				this.setGraphic(null);
+				this.hasPiece = false;
+			}
 		}
 
 		/**
@@ -182,7 +185,7 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 		public void handle(ActionEvent event) {
 			int row = this.getRow();
 			int col = this.getCol();
-			System.out.println(row + "" + col + " is highlighted: " + this.isHighlighted);
+
 			if(this.isHighLighted()) {
 				Move move = new Move(lastSquareClicked.getRow(),
 										lastSquareClicked.getCol(),
@@ -198,17 +201,21 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 					player2Label.setTextFill(Color.BLACK);
 				}
 
+//				this.hasPiece = false;
 				game.pushMove(move);
+				System.out.println();
 				System.out.println(game);
 				lastSquareClicked = null;
 				
 				
 				//update graphics
+//				lastSquareClicked.hasPiece(false);
+				
 				for(int r = 0; r < 8; r++) {
 					for(int c = 0; c < 8; c++) {
 						ChessBoardController.buttons[r][c].updateImage();
-						if(ChessBoardController.buttons[r][c].getGraphic() != null) {
-						}
+//						if(ChessBoardController.buttons[r][c].getGraphic() != null) {
+//						}
 					}
 				}
 
@@ -236,10 +243,12 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 				resetHighLightedSquares();
 				System.out.println();
 				System.out.println(this);
+				
+				// TODO: bug - hasPiece is not set to false upon a piece moving out of a square
 				if(this.hasPiece) {
 					Piece piece = game.getPieceAt(row, col);
 					Coordinate cord = new Coordinate(row,col);
-					try {
+//					try {
 						List<Move> legalMoves = piece.getLegalMoves(game, cord);
 						for(Move move: legalMoves){
 							int r = move.getToRow();
@@ -247,9 +256,9 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 
 							highLightSquare(r,c);
 						}
-					} catch (NullPointerException npe) {
-						
-					}
+//					} catch (NullPointerException npe) {
+//						
+//					}
 					
 				}
 				lastSquareClicked = this;
@@ -271,6 +280,10 @@ public class ChessBoardController implements EventHandler<ActionEvent>, Initiali
 		public boolean isHighLighted() {
 			//System.out.println("Checking highlighted status: " + this.isHighlighted);
 			return this.isHighlighted;
+		}
+		
+		public void hasPiece(boolean bool) {
+			this.hasPiece = bool;
 		}
 
 		/**
